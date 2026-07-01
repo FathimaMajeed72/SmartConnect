@@ -1,17 +1,21 @@
+import { CreateUserToken } from "../../application/types/create-user-token.type";
 import { UserToken } from "../entities/user-token.entity";
 import { TokenType } from "../enums/token-type.enum";
 
 export interface UserTokenRepository {
-  create(token: UserToken): Promise<UserToken>;
+  create(token: CreateUserToken): Promise<UserToken>;
 
-  findByTokenHash(tokenHash: string): Promise<UserToken | null>;
+  findByToken(tokenHash: string): Promise<UserToken | null>;
 
-  findByUserId(
+  findByUserIdAndType(
     userId: string,
     type: TokenType
   ): Promise<UserToken | null>;
 
-  delete(id: string): Promise<void>;
+  deleteByToken(tokenHash: string): Promise<void>;
 
-  deleteByUserId(userId: string, type: TokenType): Promise<void>;
-} 
+  deleteByUserIdAndType(
+    userId: string,
+    type: TokenType
+  ): Promise<void>;
+}

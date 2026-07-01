@@ -11,7 +11,7 @@ export interface UserTokenDocument {
 
   expiresAt: Date;
 
-  usedAt?: Date | null;
+  usedAt?: Date;
 
   createdAt: Date;
 

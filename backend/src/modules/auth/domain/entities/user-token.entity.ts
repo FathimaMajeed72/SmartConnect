@@ -11,7 +11,7 @@ export interface UserToken {
 
   expiresAt: Date;
 
-  usedAt: Date;
+  usedAt?: Date;
 
   createdAt: Date;
 }
