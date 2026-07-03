@@ -1,7 +1,8 @@
 import { AccessTokenPayload, RefreshTokenPayload } from "../types/jwt-payload.type";
+import { Role } from "../../domain/enums/role.enum";
 
 export interface TokenService {
-  generateAccessToken(userId: string, role: string): Promise<string>;
+  generateAccessToken(userId: string, role: Role): Promise<string>;
 
   generateRefreshToken(userId: string): Promise<string>;
 
