@@ -11,7 +11,7 @@ export interface UserTokenDocument {
 
   expiresAt: Date;
 
-  usedAt?: Date;
+  usedAt: Date | null;
 
   createdAt: Date;
 
@@ -61,6 +61,11 @@ userTokenSchema.index({ userId: 1 });
 userTokenSchema.index({ tokenHash: 1 });
 
 userTokenSchema.index({ expiresAt: 1 });
+
+userTokenSchema.index({
+  userId: 1,
+  type: 1,
+});
 
 export const UserTokenModel = model<UserTokenDocument>(
   "UserToken",

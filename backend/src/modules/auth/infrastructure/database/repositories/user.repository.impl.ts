@@ -6,16 +6,15 @@ import { UserRepository } from "../../../domain/repositories/user.repository";
 
 import { UserModel } from "../models/user.model";
 import { UserMapper } from "../mappers/user.mapper";
-import { CreateUser } from "../../../application/types/create-user.type";
 import { UserStatus } from "../../../domain/enums/user-status.enum";
 
 
 
 export class UserRepositoryImpl implements UserRepository {
 
-    async create(user: CreateUser): Promise<User> {
+    async create(user: User): Promise<User> {
         const document = await UserModel.create(
-            UserMapper.createToDocument(user)
+            UserMapper.toDocument(user)
         );
 
         return UserMapper.toDomain(document);
@@ -52,7 +51,7 @@ export class UserRepositoryImpl implements UserRepository {
     async update(user: User): Promise<User> {
         const document = await UserModel.findByIdAndUpdate(
             user.id,
-            UserMapper.updateToDocument(user),
+            UserMapper.toDocument(user),
             {
             new: true,
             runValidators: true,

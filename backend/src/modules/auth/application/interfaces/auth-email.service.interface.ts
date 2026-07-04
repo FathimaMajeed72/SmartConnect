@@ -1,11 +1,13 @@
 export interface AuthEmailService {
   sendActivationEmail(
+    firstName: string,
     email: string,
-    activationLink: string
+    token: string
   ): Promise<void>;
 
   sendPasswordResetEmail(
+    firstName: string,
     email: string,
-    resetLink: string
+    token: string
   ): Promise<void>;
 }

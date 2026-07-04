@@ -1,4 +1,3 @@
-import { CreateUser } from "../../../application/types/create-user.type";
 import { User } from "../../../domain/entities/user.entity";
 import { HydratedUserDocument } from "../models/user.model";
 
@@ -32,31 +31,8 @@ export class UserMapper {
   }
 
   
-    // Converts a CreateUser object into a MongoDB document.
-
-  static createToDocument(user: CreateUser) {
-    return {
-      firstName: user.firstName,
-      lastName: user.lastName,
-
-      email: user.email,
-      phone: user.phone,
-
-      passwordHash: user.passwordHash,
-
-      role: user.role,
-      status: user.status,
-
-      isEmailVerified: user.isEmailVerified,
-
-      lastLogin: user.lastLogin,
-      passwordChangedAt: user.passwordChangedAt,
-    };
-  }
-
-  //Converts a User entity into a MongoDB document for updates.
-   
-  static updateToDocument(user: User) {
+   // Converts a User entity to a MongoDB document
+  static toDocument(user: User) {
     return {
       firstName: user.firstName,
       lastName: user.lastName,

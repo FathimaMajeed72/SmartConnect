@@ -22,6 +22,20 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().regex(/^\d+(ms|s|m|h|d|w|y)$/),
 
   JWT_REFRESH_EXPIRES_IN: z.string().regex(/^\d+(ms|s|m|h|d|w|y)$/),
+
+  ACTIVATION_TOKEN_EXPIRES_IN_HOURS: z.coerce.number().positive().default(24),
+
+  EMAIL_HOST: z.string().min(1),
+
+  EMAIL_PORT: z.coerce.number().positive(),
+
+  EMAIL_USER: z.email(),
+
+  EMAIL_PASSWORD: z.string().min(1),
+
+  EMAIL_FROM: z.string().min(1),
+
+  FRONTEND_URL: z.url(),
   
 });
 
@@ -53,6 +67,21 @@ export const env = {
     accessExpiresIn: parsed.data.JWT_ACCESS_EXPIRES_IN as SignOptions["expiresIn"],
 
     refreshExpiresIn: parsed.data.JWT_REFRESH_EXPIRES_IN as SignOptions["expiresIn"],
+  },
+
+  activationTokenExpiresInHours:
+  parsed.data.ACTIVATION_TOKEN_EXPIRES_IN_HOURS,
+
+  email: {
+    host: parsed.data.EMAIL_HOST,
+    port: parsed.data.EMAIL_PORT,
+    user: parsed.data.EMAIL_USER,
+    password: parsed.data.EMAIL_PASSWORD,
+    from: parsed.data.EMAIL_FROM,
+  },
+
+  frontend: {
+    url: parsed.data.FRONTEND_URL,
   },
 
 };

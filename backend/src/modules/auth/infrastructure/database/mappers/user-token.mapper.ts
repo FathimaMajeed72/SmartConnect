@@ -1,10 +1,8 @@
-import { CreateUserToken } from "../../../application/types/create-user-token.type";
 import { UserToken } from "../../../domain/entities/user-token.entity";
 import { HydratedUserTokenDocument } from "../models/user-token.model";
 
 export class UserTokenMapper {
-  
-//Converts a MongoDB document to a Domain Entity.
+  //Converts a MongoDB document to a Domain Entity.
 
   static toDomain(document: HydratedUserTokenDocument): UserToken {
     return {
@@ -26,7 +24,7 @@ export class UserTokenMapper {
 
   //Converts a CreateUserToken object into a MongoDB document.
 
-  static createToDocument(token: CreateUserToken) {
+  static toDocument(token: UserToken) {
     return {
       userId: token.userId,
 
@@ -35,6 +33,8 @@ export class UserTokenMapper {
       type: token.type,
 
       expiresAt: token.expiresAt,
+
+      usedAt: token.usedAt,
     };
   }
 }
