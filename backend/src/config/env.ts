@@ -25,6 +25,8 @@ const envSchema = z.object({
 
   ACTIVATION_TOKEN_EXPIRES_IN_HOURS: z.coerce.number().positive().default(24),
 
+  REFRESH_TOKEN_EXPIRES_IN_DAYS: z.coerce.number().positive().default(7 ),
+
   EMAIL_HOST: z.string().min(1),
 
   EMAIL_PORT: z.coerce.number().positive(),
@@ -71,6 +73,9 @@ export const env = {
 
   activationTokenExpiresInHours:
   parsed.data.ACTIVATION_TOKEN_EXPIRES_IN_HOURS,
+
+  refreshTokenExpiresInDays: 
+  parsed.data.REFRESH_TOKEN_EXPIRES_IN_DAYS,
 
   email: {
     host: parsed.data.EMAIL_HOST,
