@@ -8,6 +8,8 @@ export interface UserTokenRepository {
 
   findByUserIdAndType(userId: string, type: TokenType): Promise<UserToken | null>;
 
+  update(token: UserToken): Promise<UserToken>;
+
   deleteByToken(tokenHash: string): Promise<void>;
 
   deleteByUserIdAndType(userId: string, type: TokenType): Promise<void>;

@@ -43,6 +43,23 @@ export class UserTokenRepositoryImpl implements UserTokenRepository {
     return UserTokenMapper.toDomain(document);
   }
 
+  async update(token: UserToken): Promise<UserToken> {
+    const document = await UserTokenModel.findByIdAndUpdate(
+      token.id,
+      UserTokenMapper.toDocument(token),
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    if (!document) {
+      throw new Error("User token not found.");
+    }
+
+    return UserTokenMapper.toDomain(document);
+  }
+
   async deleteByToken(tokenHash: string): Promise<void> {
     await UserTokenModel.deleteOne({
       tokenHash,

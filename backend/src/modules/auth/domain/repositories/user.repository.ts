@@ -1,7 +1,5 @@
-
 import { User } from "../entities/user.entity";
 import { UserStatus } from "../enums/user-status.enum";
-
 
 export interface UserRepository {
   create(user: User): Promise<User>;
@@ -12,5 +10,5 @@ export interface UserRepository {
 
   update(user: User): Promise<User>;
 
-  updateStatus(id: string,status: UserStatus): Promise<User>;
+  updateStatus(id: string, status: UserStatus): Promise<User>;
 }
