@@ -14,6 +14,7 @@ import { NodemailerEmailService } from "../infrastructure/email/nodemailer-email
 import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password-hasher.impl";
 import { JwtTokenService } from "../infrastructure/security/jwt-token.service.impl";
 import { RefreshTokenUseCase } from "../application/use-cases/refresh-token.use-case";
+import { LogoutUseCase } from "../application/use-cases/logout.use-case";
 
 const userRepository = new UserRepositoryImpl();
 
@@ -59,9 +60,15 @@ const refreshTokenUseCase = new RefreshTokenUseCase(
   tokenService,
 );
 
+const logoutUseCase = new LogoutUseCase(
+  userTokenRepository, 
+  tokenHasher, 
+  tokenService);
+
 export const authController = new AuthController(
   inviteUserUseCase,
   activateAccountUseCase,
   loginUseCase,
-  refreshTokenUseCase
+  refreshTokenUseCase,
+  logoutUseCase,
 );

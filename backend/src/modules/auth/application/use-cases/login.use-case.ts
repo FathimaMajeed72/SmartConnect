@@ -26,8 +26,8 @@ export class LoginUseCase {
 
     private readonly tokenService: TokenService,
   ) {}
-
-  async execute(request: LoginRequest): Promise<LoginResponse> {
+async execute(request: LoginRequest): Promise<LoginResponse> {
+  
     const user = await this.userRepository.findByEmail(request.email);
 
     if (!user) {

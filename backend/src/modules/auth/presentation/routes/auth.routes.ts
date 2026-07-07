@@ -8,6 +8,7 @@ import { inviteUserSchema } from "../validators/invite-user.validator";
 import { activateAccountSchema } from "../validators/activate-account.validator";
 import { loginSchema } from "../validators/login.validator";
 import { refreshTokenSchema } from "../validators/refresh-token.validator";
+import { logoutSchema } from "../validators/logout.validator";
 
 const router = Router();
 
@@ -33,6 +34,12 @@ router.post(
   "/refresh-token",
   validate(refreshTokenSchema),
   authController.refreshToken.bind(authController),
+);
+
+router.post(
+  "/logout",
+  validate(logoutSchema),
+  authController.logout.bind(authController),
 );
 
 export default router;
