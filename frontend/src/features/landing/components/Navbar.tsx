@@ -15,7 +15,7 @@ export default function Navbar() {
         <Link to="/login">
           <Button>Login</Button>
         </Link>
-        
+
       </Container>
     </header>
   );
