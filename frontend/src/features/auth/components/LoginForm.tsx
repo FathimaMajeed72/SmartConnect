@@ -7,34 +7,76 @@ import PasswordInput from "./PasswordInput";
 import { Link } from "react-router-dom";
 import GoogleButton from "./GoogleButton";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { loginSchema, type LoginFormData } from "../schemas/login.schema";
+import { login } from "../services/auth.service";
+
 export default function LoginForm() {
   const isLoading = false;
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await login(data);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <form noValidate className="space-y-5">
+    <form noValidate className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
       {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" name="email" autoComplete="email" placeholder="Enter your email" />
-        {/* Validation error to be added here*/}
+        <Input
+          id="email"
+          type="email"
+          autoFocus
+          autoComplete="email"
+          placeholder="Enter your email"
+          {...register("email")}
+        />
+        {errors.email && (
+          <p className="text-sm text-destructive">{errors.email.message}</p>
+        )}
       </div>
 
       {/* Password */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <Label htmlFor="password">Password</Label>
-        <PasswordInput id="password" name="password" autoComplete="current-password" placeholder="Enter your password" />
+        <PasswordInput
+          id="password"
+          autoComplete="current-password"
+          placeholder="Enter your password"
+          {...register("password")}
+        />
+        {errors.password && (
+          <p className="text-sm text-destructive">{errors.password.message}</p>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+        <Label
+          htmlFor="remember"
+          className="flex items-center gap-2 cursor-pointer font-normal"
+        >
           <Checkbox id="remember" />
-          <Label
-            htmlFor="remember"
-            className="text-sm font-normal cursor-pointer"
-          >
-            Remember me
-          </Label>
-        </div>
+          Remember me
+        </Label>
 
         <Link
           to="/forgot-password"
