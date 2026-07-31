@@ -5,6 +5,10 @@ import LoginPage from "@/features/auth/pages/LoginPage";
 import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
 import VerifyOtpPage from "@/features/auth/pages/VerifyOtpPage";
 import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
+import AdminDashboard from "@/features/admin/pages/AdminDashboard";
+import TeacherDashboard from "@/features/teacher/pages/TeacherDashboard";
+import ParentDashboard from "@/features/parent/pages/ParentDashboard";
+import ProtectedRoute from "@/shared/components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +33,23 @@ const router = createBrowserRouter([
       {
         path: "/reset-password",
         element: <ResetPasswordPage />,
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/admin/dashboard",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "/teacher/dashboard",
+        element: <TeacherDashboard />,
+      },
+      {
+        path: "/parent/dashboard",
+        element: <ParentDashboard />,
       },
     ],
   },

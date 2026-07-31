@@ -23,20 +23,17 @@ export class RefreshTokenUseCase {
     private readonly tokenService: TokenService,
   ) {}
 
-  async execute(
-    request: RefreshTokenRequest
-  ): Promise<RefreshTokenResponse> {
+  async execute(request: RefreshTokenRequest): Promise<RefreshTokenResponse> {
+    console.log("1. Verify token");
+    await this.tokenService.verifyRefreshToken(request.refreshToken);
 
-    await this.tokenService.verifyRefreshToken(
-      request.refreshToken
-    );
+    console.log("2. Hash token");
+    const tokenHash = this.tokenHasher.hash(request.refreshToken);
 
-    const tokenHash = this.tokenHasher.hash(
-      request.refreshToken
-    );
+    console.log("3. Find stored token");
+    const storedToken = await this.userTokenRepository.findByToken(tokenHash);
 
-    const storedToken =
-      await this.userTokenRepository.findByToken(tokenHash);
+    console.log(storedToken);
 
     if (!storedToken) {
       throw new InvalidRefreshTokenError();
@@ -46,9 +43,7 @@ export class RefreshTokenUseCase {
       throw new RefreshTokenExpiredError();
     }
 
-    const user = await this.userRepository.findById(
-      storedToken.userId
-    );
+    const user = await this.userRepository.findById(storedToken.userId);
 
     if (!user) {
       throw new InvalidRefreshTokenError();
@@ -58,14 +53,17 @@ export class RefreshTokenUseCase {
       throw new InvalidRefreshTokenError();
     }
 
-    const accessToken =
-      await this.tokenService.generateAccessToken(
-        user.id,
-        user.role
-      );
+    const accessToken = await this.tokenService.generateAccessToken(user.id, user.role);
 
     return {
       accessToken,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
     };
   }
 }

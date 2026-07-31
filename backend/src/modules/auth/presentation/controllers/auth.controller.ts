@@ -42,23 +42,50 @@ export class AuthController {
     try {
       const response = await this.loginUseCase.execute(req.body);
 
+      res.cookie("refreshToken", response.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
       res.status(200).json({
         success: true,
-        data: response,
+        data: {
+          accessToken: response.accessToken,
+          user: response.user,
+        },
       });
     } catch (error) {
       next(error);
     }
   }
-  async refreshToken(req: Request, res: Response, next: NextFunction) {
+  async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const response = await this.refreshTokenUseCase.execute(req.body);
+      console.log("Cookies:", req.cookies);
+
+      const refreshToken = req.cookies.refreshToken;
+
+      if (!refreshToken) {
+        res.status(401).json({
+          success: false,
+          message: "Refresh token is missing.",
+        });
+        return;
+      }
+
+      console.log("Refresh Token:", refreshToken);
+
+      const response = await this.refreshTokenUseCase.execute({
+        refreshToken,
+      });
 
       res.status(200).json({
         success: true,
         data: response,
       });
     } catch (error) {
+      console.error(error);
       next(error);
     }
   }

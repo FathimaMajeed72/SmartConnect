@@ -13,7 +13,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "../schemas/login.schema";
 import { login } from "../services/auth.service";
 
+import { useAppDispatch } from "@/app/store/hooks";
+import { setCredentials } from "../slices/authSlice";
+
+import { useNavigate } from "react-router-dom";
+
 export default function LoginForm() {
+  const dispatch = useAppDispatch();
+
+  const navigate = useNavigate();
+
   const isLoading = false;
 
   const {
@@ -31,6 +40,26 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await login(data);
+
+      dispatch(setCredentials(response));
+
+      switch (response.user.role) {
+        case "ADMIN":
+          navigate("/admin/dashboard");
+          break;
+
+        case "TEACHER":
+          navigate("/teacher/dashboard");
+          break;
+
+        case "PARENT":
+          navigate("/parent/dashboard");
+          break;
+
+        default:
+          navigate("/");
+      }
+
       console.log(response);
     } catch (error) {
       console.error(error);
