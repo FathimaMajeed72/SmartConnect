@@ -27,6 +27,8 @@ const envSchema = z.object({
 
   REFRESH_TOKEN_EXPIRES_IN_DAYS: z.coerce.number().positive().default(7 ),
 
+  RESET_PASSWORD_OTP_EXPIRES_IN_MINUTES: z.coerce.number().positive().default(10),
+
   EMAIL_HOST: z.string().min(1),
 
   EMAIL_PORT: z.coerce.number().positive(),
@@ -76,6 +78,9 @@ export const env = {
 
   refreshTokenExpiresInDays: 
   parsed.data.REFRESH_TOKEN_EXPIRES_IN_DAYS,
+
+  resetPasswordOtpExpiresInMinutes:
+  parsed.data.RESET_PASSWORD_OTP_EXPIRES_IN_MINUTES,
 
   email: {
     host: parsed.data.EMAIL_HOST,

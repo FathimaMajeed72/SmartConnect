@@ -7,7 +7,11 @@ import { validate } from "../../../../shared/presentation/middlewares/validation
 import { inviteUserSchema } from "../validators/invite-user.validator";
 import { activateAccountSchema } from "../validators/activate-account.validator";
 import { loginSchema } from "../validators/login.validator";
-import { logoutSchema } from "../validators/logout.validator";
+import { forgotPasswordSchema } from "../validators/forgot-password.validator";
+import { resetPasswordSchema } from "../validators/reset-password.validator";
+import { verifyResetOtpSchema } from "../validators/verify-reset-otp.validator";
+import { resendOtpSchema } from "../validators/resend-otp.validator";
+
 
 const router = Router();
 
@@ -36,8 +40,31 @@ router.post(
 
 router.post(
   "/logout",
-  validate(logoutSchema),
   authController.logout.bind(authController),
+);
+
+router.post(
+  "/forgot-password",
+  validate(forgotPasswordSchema),
+  authController.forgotPassword.bind(authController),
+);
+
+router.post(
+    "/verify-reset-otp",
+    validate(verifyResetOtpSchema),
+    authController.verifyResetOtp.bind(authController),
+);
+
+router.post(
+  "/reset-password",
+  validate(resetPasswordSchema),
+  authController.resetPassword.bind(authController),
+);
+
+router.post(
+  "/resend-otp",
+  validate(resendOtpSchema),
+  authController.resendOtp.bind(authController),
 );
 
 export default router;

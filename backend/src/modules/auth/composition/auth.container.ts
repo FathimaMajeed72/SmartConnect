@@ -15,6 +15,11 @@ import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password
 import { JwtTokenService } from "../infrastructure/security/jwt-token.service.impl";
 import { RefreshTokenUseCase } from "../application/use-cases/refresh-token.use-case";
 import { LogoutUseCase } from "../application/use-cases/logout.use-case";
+import { ForgotPasswordUseCase } from "../application/use-cases/forgot-password.use-case";
+import { SixDigitOtpGenerator } from "../infrastructure/security/six-digit-otp-generator";
+import { VerifyResetOtpUseCase } from "../application/use-cases/verify-reset-otp.use-case";
+import { ResetPasswordUseCase } from "../application/use-cases/reset-password.use-case";
+import { ResendResetOtpUseCase } from "../application/use-cases/resend-reset-otp.use-case";
 
 const userRepository = new UserRepositoryImpl();
 
@@ -23,6 +28,8 @@ const userTokenRepository = new UserTokenRepositoryImpl();
 const randomTokenGenerator = new CryptoRandomTokenGenerator();
 
 const tokenHasher = new Sha256TokenHasher();
+
+const otpGenerator = new SixDigitOtpGenerator();
 
 const emailService = new NodemailerEmailService();
 
@@ -60,10 +67,35 @@ const refreshTokenUseCase = new RefreshTokenUseCase(
   tokenService,
 );
 
-const logoutUseCase = new LogoutUseCase(
-  userTokenRepository, 
-  tokenHasher, 
-  tokenService);
+const logoutUseCase = new LogoutUseCase(userTokenRepository, tokenHasher, tokenService);
+
+const forgotPasswordUseCase = new ForgotPasswordUseCase(
+  userRepository,
+  userTokenRepository,
+  otpGenerator,
+  tokenHasher,
+  emailService,
+);
+
+const verifyResetOtpUseCase = new VerifyResetOtpUseCase(
+  userRepository,
+  userTokenRepository,
+  tokenHasher,
+);
+
+const resetPasswordUseCase = new ResetPasswordUseCase(
+  userRepository,
+  userTokenRepository,
+  passwordHasher,
+);
+
+const resendResetOtpUseCase = new ResendResetOtpUseCase(
+  userRepository,
+  userTokenRepository,
+  otpGenerator,
+  tokenHasher,
+  emailService,
+);
 
 export const authController = new AuthController(
   inviteUserUseCase,
@@ -71,4 +103,8 @@ export const authController = new AuthController(
   loginUseCase,
   refreshTokenUseCase,
   logoutUseCase,
+  forgotPasswordUseCase,
+  verifyResetOtpUseCase,
+  resetPasswordUseCase,
+  resendResetOtpUseCase,
 );

@@ -17,6 +17,9 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { setCredentials } from "../slices/authSlice";
 
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
+import { getErrorMessage } from "@/core/utils/getErrorMessage";
 
 export default function LoginForm() {
   const dispatch = useAppDispatch();
@@ -41,6 +44,10 @@ export default function LoginForm() {
     try {
       const response = await login(data);
 
+      console.log("Login success", response);
+
+      toast.success("Login successful.");
+
       dispatch(setCredentials(response));
 
       switch (response.user.role) {
@@ -63,6 +70,7 @@ export default function LoginForm() {
       console.log(response);
     } catch (error) {
       console.error(error);
+      toast.error(getErrorMessage(error));
     }
   };
 

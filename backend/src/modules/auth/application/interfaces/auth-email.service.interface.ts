@@ -5,9 +5,10 @@ export interface AuthEmailService {
     token: string
   ): Promise<void>;
 
-  sendPasswordResetEmail(
+  sendPasswordResetOtpEmail(
     firstName: string,
     email: string,
-    token: string
+    otp: string
   ): Promise<void>;
+
 }

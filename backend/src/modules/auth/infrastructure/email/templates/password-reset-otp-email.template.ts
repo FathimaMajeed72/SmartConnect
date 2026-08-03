@@ -1,8 +1,8 @@
 import { EmailTemplate } from "../types/email-template.type";
 
-export function buildPasswordResetEmail(
+export function buildPasswordResetOtpEmail(
   firstName: string,
-  resetLink: string
+  otp: string
 ): EmailTemplate {
   return {
     subject: "Reset your SmartConnect password",
@@ -12,9 +12,11 @@ export function buildPasswordResetEmail(
 
     We received a request to reset your SmartConnect password.
 
-    You can reset your password using the link below:
+    Your verification code is:
 
-    ${resetLink}
+    ${otp}
+
+    This code expires in 10 minutes.
 
     If you didn't request a password reset, you can safely ignore this email.
     `,
@@ -24,17 +26,11 @@ export function buildPasswordResetEmail(
 
     <p>Hello <strong>${firstName}</strong>,</p>
 
-    <p>We received a request to reset your SmartConnect password.</p>
+    <p>Use the following OTP to reset your password:</p>
 
-    <p>
-    Click the link below to reset your password:
-    </p>
+    <h1>${otp}</h1>
 
-    <p>
-    <a href="${resetLink}">
-        Reset Password
-    </a>
-    </p>
+    <p>This OTP is valid for 10 minutes.</p>
 
     <p>
     If you didn't request a password reset, you can safely ignore this email.

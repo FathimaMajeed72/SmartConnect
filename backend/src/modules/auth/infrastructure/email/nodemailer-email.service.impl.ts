@@ -5,7 +5,7 @@ import { AuthEmailService } from "../../application/interfaces/auth-email.servic
 import { mailer } from "./mailer";
 
 import { buildActivationEmail } from "./templates/activation-email.template"; 
-import { buildPasswordResetEmail } from "./templates/password-reset-email.template";
+import { buildPasswordResetOtpEmail } from "./templates/password-reset-otp-email.template";
 
 
 export class NodemailerEmailService implements AuthEmailService {
@@ -36,17 +36,14 @@ export class NodemailerEmailService implements AuthEmailService {
 
     }
 
-    async sendPasswordResetEmail(
+    async sendPasswordResetOtpEmail(
         firstName: string,
         email: string,
-        token: string
+        otp: string
         ): Promise<void> {
 
-        const resetLink =
-            `${env.frontend.url}/auth/reset-password?token=${token}`;
-
         const template =
-            buildPasswordResetEmail(firstName, resetLink);
+            buildPasswordResetOtpEmail(firstName, otp);
 
         await mailer.sendMail({
             from: env.email.from,

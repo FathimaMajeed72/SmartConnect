@@ -36,7 +36,9 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config as RetryRequestConfig;
 
-    if (originalRequest.url === "/auth/refresh-token") {
+    const isAuthRoute = originalRequest.url?.startsWith("/auth/");
+
+    if (isAuthRoute) {
       return Promise.reject(error);
     }
 

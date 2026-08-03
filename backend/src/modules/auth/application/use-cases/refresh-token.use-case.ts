@@ -30,6 +30,8 @@ export class RefreshTokenUseCase {
     console.log("2. Hash token");
     const tokenHash = this.tokenHasher.hash(request.refreshToken);
 
+    console.log("Generated hash:", tokenHash);
+
     console.log("3. Find stored token");
     const storedToken = await this.userTokenRepository.findByToken(tokenHash);
 
