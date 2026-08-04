@@ -9,6 +9,7 @@ import AdminDashboard from "@/features/admin/pages/AdminDashboard";
 import TeacherDashboard from "@/features/teacher/pages/TeacherDashboard";
 import ParentDashboard from "@/features/parent/pages/ParentDashboard";
 import ProtectedRoute from "@/shared/components/ProtectedRoute";
+import AdminLayout from "@/features/admin/layouts/AdminLayout";
 
 const router = createBrowserRouter([
   {
@@ -39,9 +40,14 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
-      {
-        path: "/admin/dashboard",
-        element: <AdminDashboard />,
+       {
+        element: <AdminLayout />,
+        children: [
+          {
+            path: "/admin/dashboard",
+            element: <AdminDashboard />,
+          },
+        ],
       },
       {
         path: "/teacher/dashboard",
