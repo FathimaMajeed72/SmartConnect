@@ -10,6 +10,9 @@ import TeacherDashboard from "@/features/teacher/pages/TeacherDashboard";
 import ParentDashboard from "@/features/parent/pages/ParentDashboard";
 import ProtectedRoute from "@/shared/components/ProtectedRoute";
 import AdminLayout from "@/features/admin/layouts/AdminLayout";
+import RoleProtectedRoute from "@/shared/components/RoleProtectedRoute";
+import UnauthorizedPage from "@/shared/pages/UnauthorizedPage";
+import ParentManagement from "@/features/admin/pages/ParentManagement";
 
 const router = createBrowserRouter([
   {
@@ -40,24 +43,48 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
-       {
-        element: <AdminLayout />,
+      {
+        element: <RoleProtectedRoute allowedRole="ADMIN" />,
         children: [
           {
-            path: "/admin/dashboard",
-            element: <AdminDashboard />,
+            element: <AdminLayout />,
+            children: [
+              {
+                path: "/admin/dashboard",
+                element: <AdminDashboard />,
+              },
+              {
+                path: "/admin/parents",
+                element: <ParentManagement />,
+              },
+            ],
           },
         ],
       },
       {
-        path: "/teacher/dashboard",
-        element: <TeacherDashboard />,
+        element: <RoleProtectedRoute allowedRole="TEACHER" />,
+        children: [
+          {
+            path: "/teacher/dashboard",
+            element: <TeacherDashboard />,
+          },
+        ],
       },
       {
-        path: "/parent/dashboard",
-        element: <ParentDashboard />,
+        element: <RoleProtectedRoute allowedRole="PARENT" />,
+        children: [
+          {
+            path: "/parent/dashboard",
+            element: <ParentDashboard />,
+          },
+        ],
       },
     ],
+  },
+
+  {
+    path: "/unauthorized",
+    element: <UnauthorizedPage />,
   },
 ]);
 

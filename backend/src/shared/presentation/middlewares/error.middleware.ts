@@ -9,6 +9,7 @@ import { InvalidCredentialsError } from "../../../modules/auth/application/error
 import { UserNotActiveError } from "../../../modules/auth/application/errors/user-not-active.error";
 import { InvalidRefreshTokenError } from "../../../modules/auth/application/errors/invalid-refresh-token.error";
 import { RefreshTokenExpiredError } from "../../../modules/auth/application/errors/refresh-token-expired.error";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 export function errorMiddleware(
   error: Error,
@@ -80,6 +81,23 @@ export function errorMiddleware(
     return;
   }
 
+  if (error instanceof TokenExpiredError) {
+  res.status(401).json({
+    success: false,
+    message: "Access token has expired.",
+  });
+
+  return;
+}
+
+if (error instanceof JsonWebTokenError) {
+  res.status(401).json({
+    success: false,
+    message: "Invalid access token.",
+  });
+
+  return;
+}
   console.error(error);
 
   res.status(500).json({

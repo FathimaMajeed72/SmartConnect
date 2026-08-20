@@ -1,5 +1,3 @@
-
-
 import { AdminRepository } from "../../../domain/repositories/admin.repository";
 
 import { GetParentsQuery } from "../../../application/types/get-parents-query.type";
@@ -11,9 +9,7 @@ import { Role } from "../../../../auth/domain/enums/role.enum";
 import { UserModel } from "../../../../auth/infrastructure/database/models/user.model";
 
 export class AdminRepositoryImpl implements AdminRepository {
-  async getParents(
-    query: GetParentsQuery,
-  ): Promise<PaginatedParents> {
+  async getParents(query: GetParentsQuery): Promise<PaginatedParents> {
     const page = Math.max(query.page, 1);
     const limit = Math.max(query.limit, 1);
 
@@ -46,11 +42,12 @@ export class AdminRepositoryImpl implements AdminRepository {
       ];
     }
 
+    if (query.status) {
+      filter.status = query.status;
+    }
+
     const [documents, total] = await Promise.all([
-      UserModel.find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
+      UserModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
 
       UserModel.countDocuments(filter),
     ]);

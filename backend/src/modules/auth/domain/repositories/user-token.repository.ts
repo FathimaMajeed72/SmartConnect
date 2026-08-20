@@ -4,7 +4,7 @@ import { TokenType } from "../enums/token-type.enum";
 export interface UserTokenRepository {
   create(token: UserToken): Promise<UserToken>;
 
-  findByToken(tokenHash: string): Promise<UserToken | null>;
+  findByToken(tokenHash: string, type: TokenType): Promise<UserToken | null>;
 
   findByUserIdAndType(userId: string, type: TokenType): Promise<UserToken | null>;
 

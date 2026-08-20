@@ -14,9 +14,10 @@ export class UserTokenRepositoryImpl implements UserTokenRepository {
     return UserTokenMapper.toDomain(document);
   }
 
-  async findByToken(tokenHash: string): Promise<UserToken | null> {
+  async findByToken(tokenHash: string, type: TokenType,): Promise<UserToken | null> {
     const document = await UserTokenModel.findOne({
       tokenHash,
+      type,
     });
 
     if (!document) {

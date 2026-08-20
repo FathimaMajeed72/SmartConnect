@@ -9,6 +9,7 @@ import { TokenHasher } from "../interfaces/token-hasher.interface";
 import { InvalidActivationTokenError } from "../errors/invalid-activation-token.error";
 import { ActivationTokenExpiredError } from "../errors/activation-token-expired.error";
 import { UserStatus } from "../../domain/enums/user-status.enum";
+import { TokenType } from "../../domain/enums/token-type.enum";
 
 export class ActivateAccountUseCase {
   constructor(
@@ -24,7 +25,7 @@ export class ActivateAccountUseCase {
   async execute(request: ActivateAccountRequest): Promise<ActivateAccountResponse> {
     const tokenHash = this.tokenHasher.hash(request.token);
 
-    const userToken = await this.userTokenRepository.findByToken(tokenHash);
+    const userToken = await this.userTokenRepository.findByToken(tokenHash, TokenType.ACTIVATION);
 
     if (!userToken) {
       throw new InvalidActivationTokenError();
@@ -44,9 +45,13 @@ export class ActivateAccountUseCase {
       throw new InvalidActivationTokenError();
     }
 
+    if (user.status !== UserStatus.INVITED) {
+      throw new InvalidActivationTokenError();
+    }
+
     const passwordHash = await this.passwordHasher.hash(request.password);
 
-    const now =  new Date();
+    const now = new Date();
 
     user.passwordHash = passwordHash;
 

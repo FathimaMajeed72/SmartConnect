@@ -37,7 +37,7 @@ const passwordHasher = new BcryptPasswordHasher();
 
 const tokenService = new JwtTokenService();
 
-const inviteUserUseCase = new InviteUserUseCase(
+export const inviteUserUseCase = new InviteUserUseCase(
   userRepository,
   userTokenRepository,
   randomTokenGenerator,
