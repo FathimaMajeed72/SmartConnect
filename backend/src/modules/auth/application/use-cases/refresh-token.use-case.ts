@@ -11,6 +11,7 @@ import { InvalidRefreshTokenError } from "../errors/invalid-refresh-token.error"
 import { RefreshTokenExpiredError } from "../errors/refresh-token-expired.error";
 
 import { UserStatus } from "../../domain/enums/user-status.enum";
+import { TokenType } from "../../domain/enums/token-type.enum";
 
 export class RefreshTokenUseCase {
   constructor(
@@ -33,7 +34,7 @@ export class RefreshTokenUseCase {
     console.log("Generated hash:", tokenHash);
 
     console.log("3. Find stored token");
-    const storedToken = await this.userTokenRepository.findByToken(tokenHash);
+    const storedToken = await this.userTokenRepository.findByToken(tokenHash, TokenType.REFRESH);
 
     console.log(storedToken);
 

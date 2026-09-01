@@ -60,3 +60,17 @@ export const resetPassword = async (
 
   return response.data.data;
 };
+
+
+export interface ActivateAccountData {
+  token: string;
+  password: string;
+}
+
+export const activateAccount = async (
+  data: ActivateAccountData
+) => {
+  const response = await api.post("/auth/activate", data);
+
+  return response.data.data;
+};

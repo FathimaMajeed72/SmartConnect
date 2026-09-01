@@ -21,8 +21,9 @@ export default function AuthInitializer({ children }: Props) {
         const data = await refreshSession();
 
         dispatch(setCredentials(data));
-      } catch {
+      } catch(error) {
         // User is not logged in or refresh token is invalid.
+        console.error("AUTH INITIALIZATION FAILED:", error);
       } finally {
         setLoading(false);
       }

@@ -13,6 +13,7 @@ import AdminLayout from "@/features/admin/layouts/AdminLayout";
 import RoleProtectedRoute from "@/shared/components/RoleProtectedRoute";
 import UnauthorizedPage from "@/shared/pages/UnauthorizedPage";
 import ParentManagement from "@/features/admin/pages/ParentManagement";
+import ActivateAccountPage from "@/features/auth/pages/ActivateAccountPage";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/reset-password",
         element: <ResetPasswordPage />,
+      },
+      {
+        path: "/auth/activate",
+        element: <ActivateAccountPage />,
       },
     ],
   },

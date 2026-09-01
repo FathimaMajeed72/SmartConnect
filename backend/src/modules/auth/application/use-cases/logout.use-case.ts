@@ -1,3 +1,4 @@
+import { TokenType } from "../../domain/enums/token-type.enum";
 import { UserTokenRepository } from "../../domain/repositories/user-token.repository";
 import { LogoutRequest } from "../dtos/logout.request";
 import { LogoutResponse } from "../dtos/logout.response";
@@ -19,7 +20,7 @@ export class LogoutUseCase {
 
     const tokenHash = this.tokenHasher.hash(request.refreshToken);
 
-    const storedToken = await this.userTokenRepository.findByToken(tokenHash);
+    const storedToken = await this.userTokenRepository.findByToken(tokenHash, TokenType.REFRESH);
 
     if (!storedToken) {
       throw new InvalidRefreshTokenError();
