@@ -1,4 +1,4 @@
-export interface AuthEmailService {
+export interface IAuthEmailService {
   sendActivationEmail(
     firstName: string,
     email: string,

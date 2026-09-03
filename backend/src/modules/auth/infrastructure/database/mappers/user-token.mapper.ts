@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { UserToken } from "../../../domain/entities/user-token.entity";
 import { HydratedUserTokenDocument } from "../models/user-token.model";
 
@@ -26,7 +27,7 @@ export class UserTokenMapper {
 
   static toDocument(token: UserToken) {
     return {
-      userId: token.userId,
+      userId: new Types.ObjectId(token.userId),
 
       tokenHash: token.tokenHash,
 

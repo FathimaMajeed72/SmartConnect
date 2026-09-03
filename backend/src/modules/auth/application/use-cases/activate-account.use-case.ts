@@ -1,31 +1,32 @@
 import { ActivateAccountRequest } from "../dtos/activate-account.request";
 import { ActivateAccountResponse } from "../dtos/activate-account.response";
 
-import { UserRepository } from "../../domain/repositories/user.repository";
-import { UserTokenRepository } from "../../domain/repositories/user-token.repository";
+import { IUserRepository } from "../../domain/repositories/user.repository";
+import { IUserTokenRepository } from "../../domain/repositories/user-token.repository";
 
-import { PasswordHasher } from "../interfaces/password-hasher.interface";
-import { TokenHasher } from "../interfaces/token-hasher.interface";
+import { IPasswordHasher } from "../interfaces/password-hasher.interface";
+import { ITokenHasher } from "../interfaces/token-hasher.interface";
 import { InvalidActivationTokenError } from "../errors/invalid-activation-token.error";
 import { ActivationTokenExpiredError } from "../errors/activation-token-expired.error";
 import { UserStatus } from "../../domain/enums/user-status.enum";
 import { TokenType } from "../../domain/enums/token-type.enum";
+import { IActivateAccountUseCase } from "../use-case-interfaces/activate-account.use-case.interface";
 
-export class ActivateAccountUseCase {
+export class ActivateAccountUseCase implements IActivateAccountUseCase{
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: IUserRepository,
 
-    private readonly userTokenRepository: UserTokenRepository,
+    private readonly _userTokenRepository: IUserTokenRepository,
 
-    private readonly passwordHasher: PasswordHasher,
+    private readonly _passwordHasher: IPasswordHasher,
 
-    private readonly tokenHasher: TokenHasher,
+    private readonly _tokenHasher: ITokenHasher,
   ) {}
 
   async execute(request: ActivateAccountRequest): Promise<ActivateAccountResponse> {
-    const tokenHash = this.tokenHasher.hash(request.token);
+    const tokenHash = this._tokenHasher.hash(request.token);
 
-    const userToken = await this.userTokenRepository.findByToken(tokenHash, TokenType.ACTIVATION);
+    const userToken = await this._userTokenRepository.findByToken(tokenHash, TokenType.ACTIVATION);
 
     if (!userToken) {
       throw new InvalidActivationTokenError();
@@ -39,7 +40,7 @@ export class ActivateAccountUseCase {
       throw new InvalidActivationTokenError();
     }
 
-    const user = await this.userRepository.findById(userToken.userId);
+    const user = await this._userRepository.findById(userToken.userId);
 
     if (!user) {
       throw new InvalidActivationTokenError();
@@ -49,7 +50,7 @@ export class ActivateAccountUseCase {
       throw new InvalidActivationTokenError();
     }
 
-    const passwordHash = await this.passwordHasher.hash(request.password);
+    const passwordHash = await this._passwordHasher.hash(request.password);
 
     const now = new Date();
 
@@ -61,11 +62,11 @@ export class ActivateAccountUseCase {
 
     user.passwordChangedAt = now;
 
-    await this.userRepository.update(user);
+    await this._userRepository.update(user);
 
     userToken.usedAt = now;
 
-    await this.userTokenRepository.update(userToken);
+    await this._userTokenRepository.update(userToken);
 
     return {
       message: "Account activated successfully.",

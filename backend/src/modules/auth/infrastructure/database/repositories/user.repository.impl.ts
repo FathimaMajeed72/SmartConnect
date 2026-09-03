@@ -1,94 +1,72 @@
 import { Types } from "mongoose";
 
-
 import { User } from "../../../domain/entities/user.entity";
-import { UserRepository } from "../../../domain/repositories/user.repository";
-
-import { UserModel } from "../models/user.model";
-import { UserMapper } from "../mappers/user.mapper";
+import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { UserStatus } from "../../../domain/enums/user-status.enum";
 
+import {
+  UserDocument,
+  HydratedUserDocument,
+  UserModel,
+} from "../models/user.model";
 
+import { UserMapper } from "../mappers/user.mapper";
 
-export class UserRepositoryImpl implements UserRepository {
+import { BaseRepositoryImpl } from "../../../../../shared/infrastructure/database/base.repository.impl";
 
-    async create(user: User): Promise<User> {
-        const document = await UserModel.create(
-            UserMapper.toDocument(user)
-        );
+export class UserRepositoryImpl
+  extends BaseRepositoryImpl<User, UserDocument>
+  implements IUserRepository {
 
-        return UserMapper.toDomain(document);
+  protected readonly _model = UserModel;
+
+  protected toDomain(
+    document: HydratedUserDocument,
+  ): User {
+    return UserMapper.toDomain(document);
+  }
+
+  protected toDocument(
+    user: User,
+  ): Partial<UserDocument> {
+    return UserMapper.toDocument(user);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const document = await this._model.findOne({
+      email: normalizedEmail,
+    });
+
+    if (!document) {
+      return null;
     }
 
-    async findById(id: string): Promise<User | null> {
-        if (!Types.ObjectId.isValid(id)) {
-            return null;
-        }
+    return this.toDomain(document);
+  }
 
-        const document = await UserModel.findById(id);
-
-        if (!document) {
-            return null;
-        }
-
-        return UserMapper.toDomain(document);
+  async updateStatus(
+    id: string,
+    status: UserStatus,
+  ): Promise<User> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid user id.");
     }
 
-    async findByEmail(email: string): Promise<User | null> {
-        const normalizedEmail = email.trim().toLowerCase();
+    const document = await this._model.findByIdAndUpdate(
+      id,
+      { status },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
-        const document = await UserModel.findOne({
-            email: normalizedEmail,
-        });
-
-        if (!document) {
-            return null;
-        }
-
-        return UserMapper.toDomain(document);
+    if (!document) {
+      throw new Error("User not found.");
     }
 
-    async update(user: User): Promise<User> {
-        const document = await UserModel.findByIdAndUpdate(
-            user.id,
-            UserMapper.toDocument(user),
-            {
-            new: true,
-            runValidators: true,
-            }
-        );
-
-        if (!document) {
-            throw new Error("User not found.");
-        }
-
-        return UserMapper.toDomain(document);
-    }
-
-    async updateStatus(
-        id: string,
-        status: UserStatus
-    ): Promise<User> {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new Error("Invalid user id.");
-        }
-
-        const document = await UserModel.findByIdAndUpdate(
-            id,
-            { status },
-            {
-                new: true,
-                runValidators: true,
-            }
-        );
-
-        if (!document) {
-            throw new Error("User not found.");
-        }
-
-        return UserMapper.toDomain(document);
-    }
-
-
-    
+    return this.toDomain(document);
+  }
 }

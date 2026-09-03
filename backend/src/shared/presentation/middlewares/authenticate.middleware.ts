@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { JwtTokenService } from "../../../modules/auth/infrastructure/security/jwt-token.service.impl";
 import { Role } from "../../../modules/auth/domain/enums/role.enum";
+import { HttpStatusCode } from "../../enums/http-status-code.enum";
 
 const tokenService = new JwtTokenService();
 
@@ -21,7 +22,7 @@ export async function authenticate(
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({
+      res.status(HttpStatusCode.UNAUTHORIZED).json({
         success: false,
         message: "Authentication required.",
       });

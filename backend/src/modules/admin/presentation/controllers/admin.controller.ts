@@ -1,15 +1,15 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { GetParentsUseCase } from "../../application/use-cases/get-parents.use-case";
-
 import { ValidatedQueryRequest } from "../../../../shared/presentation/middlewares/validate-query.middleware";
 import { UserStatus } from "../../../auth/domain/enums/user-status.enum";
-import { AddParentUseCase } from "../../application/use-cases/add-parent.use-case";
+import { HttpStatusCode } from "../../../../shared/enums/http-status-code.enum";
+import { IGetParentsUseCase } from "../../application/use-case-interfaces/get-parents.use-case.interface";
+import { IAddParentUseCase } from "../../application/use-case-interfaces/add-parent.use-case.interface";
 
 export class AdminController {
   constructor(
-    private readonly getParentsUseCase: GetParentsUseCase,
-    private readonly addParentUseCase: AddParentUseCase,
+    private readonly _getParentsUseCase: IGetParentsUseCase,
+    private readonly _addParentUseCase: IAddParentUseCase,
   ) {}
 
   async getParents(req: ValidatedQueryRequest, res: Response, next: NextFunction): Promise<void> {
@@ -21,15 +21,16 @@ export class AdminController {
         status?: UserStatus;
       };
 
-      const result = await this.getParentsUseCase.execute({
+      const result = await this._getParentsUseCase.execute({
         page,
         limit,
         search,
         status,
       });
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Parents retrieved successfully.",
         data: result,
       });
     } catch (error) {
@@ -39,10 +40,11 @@ export class AdminController {
 
   async addParent(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await this.addParentUseCase.execute(req.body);
+      const result = await this._addParentUseCase.execute(req.body);
 
-      res.status(201).json({
+      res.status(HttpStatusCode.CREATED).json({
         success: true,
+        message: "Parent invitation sent successfully.",
         data: result,
       });
     } catch (error) {

@@ -1,14 +1,15 @@
 import api from "@/core/api/axios";
 import type { LoginFormData } from "../schemas/login.schema";
 import type { LoginResponse } from "../types/auth.types";
+import { API_ROUTES } from "@/core/constants/api-routes";
 
 export const login = async (data: LoginFormData): Promise<LoginResponse> => {
-  const response = await api.post("/auth/login", data);
+  const response = await api.post(API_ROUTES.AUTH.LOGIN, data);
   return response.data.data;
 };
  
 export const refreshSession = async () => {
-  const response = await api.post("/auth/refresh-token");
+  const response = await api.post(API_ROUTES.AUTH.REFRESH_TOKEN);
 
   console.log(response.data);
 
@@ -16,13 +17,13 @@ export const refreshSession = async () => {
 };
 
 export const logoutUser = async () => {
-  const response = await api.post("/auth/logout");
+  const response = await api.post(API_ROUTES.AUTH.LOGOUT);
 
   return response.data.data;
 };
 
 export const forgotPassword = async (email: string) => {
-  const response = await api.post("/auth/forgot-password", {
+  const response = await api.post(API_ROUTES.AUTH.FORGOT_PASSWORD, {
     email,
   });
 
@@ -33,7 +34,7 @@ export const verifyResetOtp = async (
   email: string,
   otp: string
 ) => {
-  const response = await api.post("/auth/verify-reset-otp", {
+  const response = await api.post(API_ROUTES.AUTH.VERIFY_RESET_OTP, {
     email,
     otp,
   });
@@ -42,7 +43,7 @@ export const verifyResetOtp = async (
 };
 
 export const resendOtp = async (email: string) => {
-  const response = await api.post("/auth/resend-otp", {
+  const response = await api.post( API_ROUTES.AUTH.RESEND_OTP, {
     email,
   });
 
@@ -53,7 +54,7 @@ export const resetPassword = async (
   email: string,
   password: string
 ) => {
-  const response = await api.post("/auth/reset-password", {
+  const response = await api.post( API_ROUTES.AUTH.RESET_PASSWORD, {
     email,
     password,
   });
@@ -70,7 +71,7 @@ export interface ActivateAccountData {
 export const activateAccount = async (
   data: ActivateAccountData
 ) => {
-  const response = await api.post("/auth/activate", data);
+  const response = await api.post(API_ROUTES.AUTH.ACTIVATE, data);
 
   return response.data.data;
 };

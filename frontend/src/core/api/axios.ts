@@ -4,6 +4,7 @@ import { refreshSession } from "@/features/auth/services/auth.service";
 import { setCredentials, logout } from "@/features/auth/slices/authSlice";
 
 import type { InternalAxiosRequestConfig } from "axios";
+import { API_ROUTES } from "@/core/constants/api-routes";
 
 interface RetryRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -36,7 +37,9 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config as RetryRequestConfig;
 
-    const isAuthRoute = originalRequest.url?.startsWith("/auth/");
+    const isAuthRoute = originalRequest.url?.startsWith(
+      `${API_ROUTES.AUTH.BASE}/`,
+    );
 
     if (isAuthRoute) {
       return Promise.reject(error);

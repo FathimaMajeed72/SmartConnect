@@ -1,33 +1,38 @@
 import { Request, Response, NextFunction } from "express";
 
-import { InviteUserUseCase } from "../../application/use-cases/invite-user.use-case";
-import { ActivateAccountUseCase } from "../../application/use-cases/activate-account.use-case";
-import { LoginUseCase } from "../../application/use-cases/login.use-case";
-import { RefreshTokenUseCase } from "../../application/use-cases/refresh-token.use-case";
-import { LogoutUseCase } from "../../application/use-cases/logout.use-case";
-import { ForgotPasswordUseCase } from "../../application/use-cases/forgot-password.use-case";
-import { VerifyResetOtpUseCase } from "../../application/use-cases/verify-reset-otp.use-case";
-import { ResetPasswordUseCase } from "../../application/use-cases/reset-password.use-case";
-import { ResendResetOtpUseCase } from "../../application/use-cases/resend-reset-otp.use-case";
+import { IInviteUserUseCase } from "../../application/use-case-interfaces/invite-user.use-case.interface";
+import { IActivateAccountUseCase } from "../../application/use-case-interfaces/activate-account.use-case.interface";
+import { ILoginUseCase } from "../../application/use-case-interfaces/login.use-case.interface";
+import { IRefreshTokenUseCase } from "../../application/use-case-interfaces/refresh-token.use-case.interface"; 
+import { ILogoutUseCase } from "../../application/use-case-interfaces/logout.use-case.interface"; 
+import { IForgotPasswordUseCase } from "../../application/use-case-interfaces/forgot-password.use-case.interface"; 
+import { IVerifyResetOtpUseCase } from "../../application/use-case-interfaces/verify-reset-otp.use-case.interface";
+import { IResetPasswordUseCase } from "../../application/use-case-interfaces/reset-password.use-case.interface";
+import { IResendResetOtpUseCase } from "../../application/use-case-interfaces/resend-reset-otp.use-case.interface";
+import { HttpStatusCode } from "../../../../shared/enums/http-status-code.enum";
 
 export class AuthController {
   constructor(
-    private readonly inviteUserUseCase: InviteUserUseCase,
-    private readonly activateAccountUseCase: ActivateAccountUseCase,
-    private readonly loginUseCase: LoginUseCase,
-    private readonly refreshTokenUseCase: RefreshTokenUseCase,
-    private readonly logoutUseCase: LogoutUseCase,
-    private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
-    private readonly verifyResetOtpUseCase: VerifyResetOtpUseCase,
-    private readonly resetPasswordUseCase: ResetPasswordUseCase,
-    private readonly resendResetOtpUseCase: ResendResetOtpUseCase,
+    private readonly _inviteUserUseCase: IInviteUserUseCase,
+    private readonly _activateAccountUseCase: IActivateAccountUseCase,
+    private readonly _loginUseCase: ILoginUseCase,
+    private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
+    private readonly _logoutUseCase: ILogoutUseCase,
+    private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
+    private readonly _verifyResetOtpUseCase: IVerifyResetOtpUseCase,
+    private readonly _resetPasswordUseCase: IResetPasswordUseCase,
+    private readonly _resendResetOtpUseCase: IResendResetOtpUseCase,
   ) {}
 
   async inviteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const response = await this.inviteUserUseCase.execute(req.body);
+      const response = await this._inviteUserUseCase.execute(req.body);
 
-      res.status(201).json(response);
+      res.status(HttpStatusCode.CREATED).json({
+        success: true,
+        message: "User invitation sent successfully.",
+        data: response,
+      });
     } catch (error) {
       next(error);
     }
@@ -35,10 +40,11 @@ export class AuthController {
 
   async activateAccount(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await this.activateAccountUseCase.execute(req.body);
+      const response = await this._activateAccountUseCase.execute(req.body);
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Account activated successfully.",
         data: response,
       });
     } catch (error) {
@@ -48,7 +54,7 @@ export class AuthController {
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await this.loginUseCase.execute(req.body);
+      const response = await this._loginUseCase.execute(req.body);
 
       res.cookie("refreshToken", response.refreshToken, {
         httpOnly: true,
@@ -57,8 +63,9 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Login successful.",
         data: {
           accessToken: response.accessToken,
           user: response.user,
@@ -75,7 +82,7 @@ export class AuthController {
       const refreshToken = req.cookies.refreshToken;
 
       if (!refreshToken) {
-        res.status(401).json({
+        res.status(HttpStatusCode.UNAUTHORIZED).json({
           success: false,
           message: "Refresh token is missing.",
         });
@@ -84,12 +91,13 @@ export class AuthController {
 
       console.log("Refresh Token:", refreshToken);
 
-      const response = await this.refreshTokenUseCase.execute({
+      const response = await this._refreshTokenUseCase.execute({
         refreshToken,
       });
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Access token refreshed successfully.",
         data: response,
       });
     } catch (error) {
@@ -103,7 +111,7 @@ export class AuthController {
       const refreshToken = req.cookies.refreshToken;
 
       if (!refreshToken) {
-        res.status(401).json({
+        res.status(HttpStatusCode.UNAUTHORIZED).json({
           success: false,
           message: "Refresh token is missing.",
         });
@@ -111,7 +119,7 @@ export class AuthController {
         return;
       }
 
-      const response = await this.logoutUseCase.execute({
+      const response = await this._logoutUseCase.execute({
         refreshToken,
       });
 
@@ -121,8 +129,9 @@ export class AuthController {
         sameSite: "lax",
       });
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Logout successful.",
         data: response,
       });
     } catch (error) {
@@ -132,10 +141,11 @@ export class AuthController {
 
   async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const response = await this.forgotPasswordUseCase.execute(req.body);
+      const response = await this._forgotPasswordUseCase.execute(req.body);
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Password reset OTP sent successfully.",
         data: response,
       });
     } catch (error) {
@@ -145,10 +155,11 @@ export class AuthController {
 
   async verifyResetOtp(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await this.verifyResetOtpUseCase.execute(req.body);
+      const response = await this._verifyResetOtpUseCase.execute(req.body);
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "OTP verified successfully.",
         data: response,
       });
     } catch (error) {
@@ -158,10 +169,11 @@ export class AuthController {
 
   async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const response = await this.resetPasswordUseCase.execute(req.body);
+      const response = await this._resetPasswordUseCase.execute(req.body);
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Password reset successfully.",
         data: response,
       });
     } catch (error) {
@@ -171,10 +183,11 @@ export class AuthController {
 
   async resendOtp(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await this.resendResetOtpUseCase.execute(req.body);
+      const response = await this._resendResetOtpUseCase.execute(req.body);
 
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
+        message: "Password reset OTP resent successfully.",
         data: response,
       });
     } catch (error) {

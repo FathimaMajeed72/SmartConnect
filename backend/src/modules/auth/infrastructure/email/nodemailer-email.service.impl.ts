@@ -1,6 +1,6 @@
 import { env } from "../../../../config/env";
 
-import { AuthEmailService } from "../../application/interfaces/auth-email.service.interface";
+import { IAuthEmailService } from "../../application/interfaces/auth-email.service.interface";
 
 import { mailer } from "./mailer";
 
@@ -8,7 +8,7 @@ import { buildActivationEmail } from "./templates/activation-email.template";
 import { buildPasswordResetOtpEmail } from "./templates/password-reset-otp-email.template";
 
 
-export class NodemailerEmailService implements AuthEmailService {
+export class NodemailerEmailService implements IAuthEmailService {
 
     async sendActivationEmail(
         firstName: string,

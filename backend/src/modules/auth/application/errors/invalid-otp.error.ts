@@ -1,7 +1,11 @@
-import { ApplicationError } from "./application.error";
+import { ApplicationError } from "../../../../shared/errors/application.error";
+import { AuthErrorCode } from "../enums/auth-error-code.enum";
 
 export class InvalidOtpError extends ApplicationError {
   constructor() {
-    super("Invalid OTP.");
+    super(
+      "Invalid OTP.",
+      AuthErrorCode.INVALID_OTP
+    );
   }
 }

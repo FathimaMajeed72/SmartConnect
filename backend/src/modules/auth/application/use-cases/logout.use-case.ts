@@ -1,32 +1,33 @@
 import { TokenType } from "../../domain/enums/token-type.enum";
-import { UserTokenRepository } from "../../domain/repositories/user-token.repository";
+import { IUserTokenRepository } from "../../domain/repositories/user-token.repository";
 import { LogoutRequest } from "../dtos/logout.request";
 import { LogoutResponse } from "../dtos/logout.response";
 import { InvalidRefreshTokenError } from "../errors/invalid-refresh-token.error";
-import { TokenHasher } from "../interfaces/token-hasher.interface";
-import { TokenService } from "../interfaces/token.service.interface";
+import { ITokenHasher } from "../interfaces/token-hasher.interface";
+import { ITokenService } from "../interfaces/token.service.interface";
+import { ILogoutUseCase } from "../use-case-interfaces/logout.use-case.interface";
 
-export class LogoutUseCase {
+export class LogoutUseCase implements ILogoutUseCase {
   constructor(
-    private readonly userTokenRepository: UserTokenRepository,
+    private readonly _userTokenRepository: IUserTokenRepository,
 
-    private readonly tokenHasher: TokenHasher,
+    private readonly _tokenHasher: ITokenHasher,
 
-    private readonly tokenService: TokenService,
+    private readonly _tokenService: ITokenService,
   ) {}
 
   async execute(request: LogoutRequest): Promise<LogoutResponse> {
-    await this.tokenService.verifyRefreshToken(request.refreshToken);
+    await this._tokenService.verifyRefreshToken(request.refreshToken);
 
-    const tokenHash = this.tokenHasher.hash(request.refreshToken);
+    const tokenHash = this._tokenHasher.hash(request.refreshToken);
 
-    const storedToken = await this.userTokenRepository.findByToken(tokenHash, TokenType.REFRESH);
+    const storedToken = await this._userTokenRepository.findByToken(tokenHash, TokenType.REFRESH);
 
     if (!storedToken) {
       throw new InvalidRefreshTokenError();
     }
 
-    await this.userTokenRepository.deleteByToken(tokenHash);
+    await this._userTokenRepository.deleteByToken(tokenHash);
 
     return {
       message: "Logged out successfully.",

@@ -8,12 +8,12 @@ import { getParentsSchema } from "../validators/get-parents.validator";
 import { validate } from "../../../../shared/presentation/middlewares/validation.middleware";
 import { addParentSchema } from "../validators/add-parent.validator";
 
-
+import { ADMIN_ROUTES } from "./admin.routes.constants";
 
 const router = Router();
 
 router.get(
-  "/parents",
+  ADMIN_ROUTES.PARENTS,
   authenticate,
   authorize(Role.ADMIN),
   validateQuery(getParentsSchema),
@@ -21,7 +21,7 @@ router.get(
 );
 
 router.post(
-  "/parents",
+  ADMIN_ROUTES.PARENTS,
   authenticate,
   authorize(Role.ADMIN),
   validate(addParentSchema),

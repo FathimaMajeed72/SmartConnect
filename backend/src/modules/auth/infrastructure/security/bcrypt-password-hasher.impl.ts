@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 
-import { PasswordHasher } from "../../application/interfaces/password-hasher.interface";
+import { IPasswordHasher } from "../../application/interfaces/password-hasher.interface";
 
 import { env } from "../../../../config/env";
 
-export class BcryptPasswordHasher implements PasswordHasher {
+export class BcryptPasswordHasher implements IPasswordHasher {
 
   async hash(password: string): Promise<string> {
     return bcrypt.hash(password, env.bcryptSaltRounds);

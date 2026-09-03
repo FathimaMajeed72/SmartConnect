@@ -1,12 +1,12 @@
 import { InviteUserRequest } from "../dtos/invite-user.request";
 import { InviteUserResponse } from "../dtos/invite-user.response";
 
-import { UserRepository } from "../../domain/repositories/user.repository";
-import { UserTokenRepository } from "../../domain/repositories/user-token.repository";
+import { IUserRepository } from "../../domain/repositories/user.repository";
+import { IUserTokenRepository } from "../../domain/repositories/user-token.repository";
 
-import { RandomTokenGenerator } from "../interfaces/random-token-generator.interface";
-import { TokenHasher } from "../interfaces/token-hasher.interface";
-import { AuthEmailService } from "../interfaces/auth-email.service.interface";
+import { IRandomTokenGenerator } from "../interfaces/random-token-generator.interface";
+import { ITokenHasher } from "../interfaces/token-hasher.interface";
+import { IAuthEmailService } from "../interfaces/auth-email.service.interface";
 
 import { EmailAlreadyExistsError } from "../errors/email-already-exists.error";
 
@@ -16,22 +16,23 @@ import { UserStatus } from "../../domain/enums/user-status.enum";
 import { TokenType } from "../../domain/enums/token-type.enum";
 
 import { env } from "../../../../config/env";
+import { IInviteUserUseCase } from "../use-case-interfaces/invite-user.use-case.interface";
 
-export class InviteUserUseCase {
+export class InviteUserUseCase implements IInviteUserUseCase {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: IUserRepository,
 
-    private readonly userTokenRepository: UserTokenRepository,
+    private readonly _userTokenRepository: IUserTokenRepository,
 
-    private readonly randomTokenGenerator: RandomTokenGenerator,
+    private readonly _randomTokenGenerator: IRandomTokenGenerator,
 
-    private readonly tokenHasher: TokenHasher,
+    private readonly _tokenHasher: ITokenHasher,
 
-    private readonly emailService: AuthEmailService,
+    private readonly _emailService: IAuthEmailService,
   ) {}
 
   async execute(request: InviteUserRequest): Promise<InviteUserResponse> {
-    const existingUser = await this.userRepository.findByEmail(request.email);
+    const existingUser = await this._userRepository.findByEmail(request.email);
 
     if (existingUser) {
       throw new EmailAlreadyExistsError();
@@ -61,13 +62,13 @@ export class InviteUserUseCase {
       updatedAt: new Date(),
     };
 
-    const createdUser = await this.userRepository.create(user);
+    const createdUser = await this._userRepository.create(user);
 
-    await this.userTokenRepository.deleteByUserIdAndType(createdUser.id, TokenType.ACTIVATION);
+    await this._userTokenRepository.deleteByUserIdAndType(createdUser.id, TokenType.ACTIVATION);
 
-    const activationToken = this.randomTokenGenerator.generate();
+    const activationToken = this._randomTokenGenerator.generate();
 
-    const tokenHash = this.tokenHasher.hash(activationToken);
+    const tokenHash = this._tokenHasher.hash(activationToken);
 
     const userToken: UserToken = {
       id: "",
@@ -85,9 +86,9 @@ export class InviteUserUseCase {
       createdAt: new Date(),
     };
 
-    await this.userTokenRepository.create(userToken);
+    await this._userTokenRepository.create(userToken);
 
-    await this.emailService.sendActivationEmail(
+    await this._emailService.sendActivationEmail(
       createdUser.firstName,
       createdUser.email,
       activationToken,

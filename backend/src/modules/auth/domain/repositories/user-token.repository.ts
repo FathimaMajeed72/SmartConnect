@@ -1,7 +1,7 @@
 import { UserToken } from "../entities/user-token.entity";
 import { TokenType } from "../enums/token-type.enum";
 
-export interface UserTokenRepository {
+export interface IUserTokenRepository {
   create(token: UserToken): Promise<UserToken>;
 
   findByToken(tokenHash: string, type: TokenType): Promise<UserToken | null>;

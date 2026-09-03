@@ -1,19 +1,20 @@
 import { AddParentRequest } from "../dtos/add-parent.request";
 import { AddParentResponse } from "../dtos/add-parent.response";
 
-import { InviteUserUseCase } from "../../../auth/application/use-cases/invite-user.use-case";
 
 import { Role } from "../../../auth/domain/enums/role.enum";
+import { IAddParentUseCase } from "../use-case-interfaces/add-parent.use-case.interface";
+import { IInviteUserUseCase } from "../../../auth/application/use-case-interfaces/invite-user.use-case.interface";
 
-export class AddParentUseCase {
+export class AddParentUseCase implements IAddParentUseCase {
   constructor(
-    private readonly inviteUserUseCase: InviteUserUseCase,
+    private readonly _inviteUserUseCase: IInviteUserUseCase,
   ) {}
 
   async execute(
     request: AddParentRequest,
   ): Promise<AddParentResponse> {
-    return this.inviteUserUseCase.execute({
+    return this._inviteUserUseCase.execute({
       firstName: request.firstName,
       lastName: request.lastName,
       email: request.email,

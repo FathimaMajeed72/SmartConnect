@@ -1,7 +1,7 @@
+import { IBaseEntity } from "../../../../shared/domain/entities/base.entity";
 import { TokenType } from "../enums/token-type.enum";
 
-export interface UserToken {
-  id: string;
+export interface UserToken extends IBaseEntity {
 
   userId: string;
 

@@ -1,4 +1,4 @@
-import { AdminRepository } from "../../../domain/repositories/admin.repository";
+import { IAdminRepository } from "../../../domain/repositories/admin.repository";
 
 import { GetParentsQuery } from "../../../application/types/get-parents-query.type";
 import {
@@ -8,7 +8,7 @@ import {
 import { Role } from "../../../../auth/domain/enums/role.enum";
 import { UserModel } from "../../../../auth/infrastructure/database/models/user.model";
 
-export class AdminRepositoryImpl implements AdminRepository {
+export class AdminRepositoryImpl implements IAdminRepository {
   async getParents(query: GetParentsQuery): Promise<PaginatedParents> {
     const page = Math.max(query.page, 1);
     const limit = Math.max(query.limit, 1);

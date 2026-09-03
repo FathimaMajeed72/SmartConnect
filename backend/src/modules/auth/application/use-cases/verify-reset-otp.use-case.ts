@@ -1,28 +1,29 @@
 import { TokenType } from "../../domain/enums/token-type.enum";
-import { UserTokenRepository } from "../../domain/repositories/user-token.repository";
-import { UserRepository } from "../../domain/repositories/user.repository";
+import { IUserTokenRepository } from "../../domain/repositories/user-token.repository";
+import { IUserRepository } from "../../domain/repositories/user.repository";
 import { VerifyResetOtpRequest } from "../dtos/verify-reset-otp.request";
 import { VerifyResetOtpResponse } from "../dtos/verify-reset-otp.response";
 import { InvalidOtpError } from "../errors/invalid-otp.error";
 import { OtpExpiredError } from "../errors/otp-expired.error";
-import { TokenHasher } from "../interfaces/token-hasher.interface";
+import { ITokenHasher } from "../interfaces/token-hasher.interface";
+import { IVerifyResetOtpUseCase } from "../use-case-interfaces/verify-reset-otp.use-case.interface";
 
-export class VerifyResetOtpUseCase {
+export class VerifyResetOtpUseCase implements IVerifyResetOtpUseCase {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: IUserRepository,
 
-    private readonly userTokenRepository: UserTokenRepository,
+    private readonly _userTokenRepository: IUserTokenRepository,
 
-    private readonly tokenHasher: TokenHasher,
+    private readonly _tokenHasher: ITokenHasher,
   ) {}
   async execute(request: VerifyResetOtpRequest): Promise<VerifyResetOtpResponse> {
-    const user = await this.userRepository.findByEmail(request.email);
+    const user = await this._userRepository.findByEmail(request.email);
 
     if (!user) {
       throw new InvalidOtpError();
     }
 
-    const storedToken = await this.userTokenRepository.findByUserIdAndType(
+    const storedToken = await this._userTokenRepository.findByUserIdAndType(
       user.id,
       TokenType.RESET_PASSWORD,
     );
@@ -39,7 +40,7 @@ export class VerifyResetOtpUseCase {
       throw new InvalidOtpError();
     }
 
-    const tokenHash = this.tokenHasher.hash(request.otp);
+    const tokenHash = this._tokenHasher.hash(request.otp);
 
     if (storedToken.tokenHash !== tokenHash) {
       throw new InvalidOtpError();
@@ -47,7 +48,7 @@ export class VerifyResetOtpUseCase {
 
     storedToken.usedAt = new Date();
 
-    await this.userTokenRepository.update(storedToken);
+    await this._userTokenRepository.update(storedToken);
 
     return {
       message: "OTP verified successfully.",

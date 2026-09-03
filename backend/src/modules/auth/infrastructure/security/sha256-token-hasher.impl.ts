@@ -1,9 +1,9 @@
 import crypto from "crypto";
 
-import { TokenHasher } from "../../application/interfaces/token-hasher.interface";
+import { ITokenHasher } from "../../application/interfaces/token-hasher.interface";
 
 export class Sha256TokenHasher
-  implements TokenHasher {
+  implements ITokenHasher {
 
   hash(token: string): string {
     return crypto

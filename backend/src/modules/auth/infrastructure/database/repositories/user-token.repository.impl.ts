@@ -1,21 +1,42 @@
-import { UserToken } from "../../../domain/entities/user-token.entity";
-import { TokenType } from "../../../domain/enums/token-type.enum";
-import { UserTokenRepository } from "../../../domain/repositories/user-token.repository";
-
-import { UserTokenMapper } from "../mappers/user-token.mapper";
-import { UserTokenModel } from "../models/user-token.model";
-
 import { Types } from "mongoose";
 
-export class UserTokenRepositoryImpl implements UserTokenRepository {
-  async create(token: UserToken): Promise<UserToken> {
-    const document = await UserTokenModel.create(UserTokenMapper.toDocument(token));
+import { UserToken } from "../../../domain/entities/user-token.entity";
+import { IUserTokenRepository } from "../../../domain/repositories/user-token.repository";
+import { TokenType } from "../../../domain/enums/token-type.enum";
 
+import {
+  UserTokenDocument,
+  HydratedUserTokenDocument,
+  UserTokenModel,
+} from "../models/user-token.model";
+
+import { UserTokenMapper } from "../mappers/user-token.mapper";
+
+import { BaseRepositoryImpl } from "../../../../../shared/infrastructure/database/base.repository.impl";
+
+export class UserTokenRepositoryImpl
+  extends BaseRepositoryImpl<UserToken, UserTokenDocument>
+  implements IUserTokenRepository {
+
+  protected readonly _model = UserTokenModel;
+
+  protected toDomain(
+    document: HydratedUserTokenDocument,
+  ): UserToken {
     return UserTokenMapper.toDomain(document);
   }
 
-  async findByToken(tokenHash: string, type: TokenType,): Promise<UserToken | null> {
-    const document = await UserTokenModel.findOne({
+  protected toDocument(
+    token: UserToken,
+  ): Partial<UserTokenDocument> {
+    return UserTokenMapper.toDocument(token);
+  }
+
+  async findByToken(
+    tokenHash: string,
+    type: TokenType,
+  ): Promise<UserToken | null> {
+    const document = await this._model.findOne({
       tokenHash,
       type,
     });
@@ -24,15 +45,18 @@ export class UserTokenRepositoryImpl implements UserTokenRepository {
       return null;
     }
 
-    return UserTokenMapper.toDomain(document);
+    return this.toDomain(document);
   }
 
-  async findByUserIdAndType(userId: string, type: TokenType): Promise<UserToken | null> {
+  async findByUserIdAndType(
+    userId: string,
+    type: TokenType,
+  ): Promise<UserToken | null> {
     if (!Types.ObjectId.isValid(userId)) {
       return null;
     }
 
-    const document = await UserTokenModel.findOne({
+    const document = await this._model.findOne({
       userId,
       type,
     });
@@ -41,38 +65,24 @@ export class UserTokenRepositoryImpl implements UserTokenRepository {
       return null;
     }
 
-    return UserTokenMapper.toDomain(document);
-  }
-
-  async update(token: UserToken): Promise<UserToken> {
-    const document = await UserTokenModel.findByIdAndUpdate(
-      token.id,
-      UserTokenMapper.toDocument(token),
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
-
-    if (!document) {
-      throw new Error("User token not found.");
-    }
-
-    return UserTokenMapper.toDomain(document);
+    return this.toDomain(document);
   }
 
   async deleteByToken(tokenHash: string): Promise<void> {
-    await UserTokenModel.deleteOne({
+    await this._model.deleteOne({
       tokenHash,
     });
   }
 
-  async deleteByUserIdAndType(userId: string, type: TokenType): Promise<void> {
+  async deleteByUserIdAndType(
+    userId: string,
+    type: TokenType,
+  ): Promise<void> {
     if (!Types.ObjectId.isValid(userId)) {
       return;
     }
 
-    await UserTokenModel.deleteOne({
+    await this._model.deleteOne({
       userId,
       type,
     });

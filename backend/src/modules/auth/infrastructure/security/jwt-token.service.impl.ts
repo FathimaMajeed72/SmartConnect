@@ -9,9 +9,9 @@ import {
   RefreshTokenPayload,
 } from "../../application/types/jwt-payload.type";
 
-import { TokenService } from "../../application/interfaces/token.service.interface";
+import { ITokenService } from "../../application/interfaces/token.service.interface";
 
-export class JwtTokenService implements TokenService {
+export class JwtTokenService implements ITokenService {
   async generateAccessToken(
     userId: string,
     role: Role

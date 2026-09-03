@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 
 import { Role } from "../../../modules/auth/domain/enums/role.enum";
 import { AuthenticatedRequest } from "./authenticate.middleware";
+import { HttpStatusCode } from "../../enums/http-status-code.enum";
 
 export function authorize(...allowedRoles: Role[]) {
   return (
@@ -10,7 +11,7 @@ export function authorize(...allowedRoles: Role[]) {
     next: NextFunction,
   ): void => {
     if (!req.user) {
-      res.status(401).json({
+      res.status(HttpStatusCode.UNAUTHORIZED).json({
         success: false,
         message: "Authentication required.",
       });
@@ -19,7 +20,7 @@ export function authorize(...allowedRoles: Role[]) {
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      res.status(403).json({
+      res.status(HttpStatusCode.FORBIDDEN).json({
         success: false,
         message: "You do not have permission to access this resource.",
       });

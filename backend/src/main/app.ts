@@ -7,8 +7,11 @@ import routes from "./routes";
 
 import { errorMiddleware } from "../shared/presentation/middlewares/error.middleware";
 import { env } from "../config/env";
+import { AuthErrorStatusMapper } from "../modules/auth/presentation/mappers/auth-error-status.mapper";
 
 const app = express();
+
+const authErrorStatusMapper = new AuthErrorStatusMapper();
 
 app.use(helmet());
 
@@ -27,6 +30,6 @@ app.use(compression());
 
 app.use("/api", routes);
 
-app.use(errorMiddleware)
+app.use(errorMiddleware(authErrorStatusMapper));
 
 export default app;

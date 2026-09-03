@@ -1,4 +1,5 @@
 import api from "@/core/api/axios";
+import { API_ROUTES } from "@/core/constants/api-routes";
 
 import type {
   CreateParentRequest,
@@ -10,7 +11,7 @@ import type {
 export const getParents = async (
   params: GetParentsParams,
 ): Promise<PaginatedParents> => {
-  const response = await api.get("/admin/parents", {
+  const response = await api.get(API_ROUTES.ADMIN.PARENTS, {
     params,
   });
 
@@ -20,7 +21,7 @@ export const getParents = async (
 export const createParent = async (
   data: CreateParentRequest,
 ): Promise<ParentListItem> => {
-  const response = await api.post("/admin/parents", data);
+  const response = await api.post(API_ROUTES.ADMIN.PARENTS, data);
 
   return response.data.data;
 };

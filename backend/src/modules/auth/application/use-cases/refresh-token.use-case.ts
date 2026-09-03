@@ -1,40 +1,41 @@
 import { RefreshTokenRequest } from "../dtos/refresh-token.request";
 import { RefreshTokenResponse } from "../dtos/refresh-token.response";
 
-import { UserRepository } from "../../domain/repositories/user.repository";
-import { UserTokenRepository } from "../../domain/repositories/user-token.repository";
+import { IUserRepository } from "../../domain/repositories/user.repository";
+import { IUserTokenRepository } from "../../domain/repositories/user-token.repository";
 
-import { TokenHasher } from "../interfaces/token-hasher.interface";
-import { TokenService } from "../interfaces/token.service.interface";
+import { ITokenHasher } from "../interfaces/token-hasher.interface";
+import { ITokenService } from "../interfaces/token.service.interface";
 
 import { InvalidRefreshTokenError } from "../errors/invalid-refresh-token.error";
 import { RefreshTokenExpiredError } from "../errors/refresh-token-expired.error";
 
 import { UserStatus } from "../../domain/enums/user-status.enum";
 import { TokenType } from "../../domain/enums/token-type.enum";
+import { IRefreshTokenUseCase } from "../use-case-interfaces/refresh-token.use-case.interface";
 
-export class RefreshTokenUseCase {
+export class RefreshTokenUseCase implements IRefreshTokenUseCase {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: IUserRepository,
 
-    private readonly userTokenRepository: UserTokenRepository,
+    private readonly _userTokenRepository: IUserTokenRepository,
 
-    private readonly tokenHasher: TokenHasher,
+    private readonly _tokenHasher: ITokenHasher,
 
-    private readonly tokenService: TokenService,
+    private readonly _tokenService: ITokenService,
   ) {}
 
   async execute(request: RefreshTokenRequest): Promise<RefreshTokenResponse> {
     console.log("1. Verify token");
-    await this.tokenService.verifyRefreshToken(request.refreshToken);
+    await this._tokenService.verifyRefreshToken(request.refreshToken);
 
     console.log("2. Hash token");
-    const tokenHash = this.tokenHasher.hash(request.refreshToken);
+    const tokenHash = this._tokenHasher.hash(request.refreshToken);
 
     console.log("Generated hash:", tokenHash);
 
     console.log("3. Find stored token");
-    const storedToken = await this.userTokenRepository.findByToken(tokenHash, TokenType.REFRESH);
+    const storedToken = await this._userTokenRepository.findByToken(tokenHash, TokenType.REFRESH);
 
     console.log(storedToken);
 
@@ -46,7 +47,7 @@ export class RefreshTokenUseCase {
       throw new RefreshTokenExpiredError();
     }
 
-    const user = await this.userRepository.findById(storedToken.userId);
+    const user = await this._userRepository.findById(storedToken.userId);
 
     if (!user) {
       throw new InvalidRefreshTokenError();
@@ -56,7 +57,7 @@ export class RefreshTokenUseCase {
       throw new InvalidRefreshTokenError();
     }
 
-    const accessToken = await this.tokenService.generateAccessToken(user.id, user.role);
+    const accessToken = await this._tokenService.generateAccessToken(user.id, user.role);
 
     return {
       accessToken,

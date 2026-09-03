@@ -1,3 +1,3 @@
-export interface RandomTokenGenerator {
+export interface IRandomTokenGenerator {
   generate(length?: number): string;
 }
