@@ -7,6 +7,8 @@ import { validateQuery } from "../../../../shared/presentation/middlewares/valid
 import { getParentsSchema } from "../validators/get-parents.validator";
 import { validate } from "../../../../shared/presentation/middlewares/validation.middleware";
 import { addParentSchema } from "../validators/add-parent.validator";
+import { getTeachersSchema } from "../validators/get-teachers.validator";
+import { addTeacherSchema } from "../validators/add-teacher.validator";
 
 import { ADMIN_ROUTES } from "./admin.routes.constants";
 
@@ -26,6 +28,22 @@ router.post(
   authorize(Role.ADMIN),
   validate(addParentSchema),
   adminController.addParent.bind(adminController),
+);
+
+router.get(
+  ADMIN_ROUTES.TEACHERS,
+  authenticate,
+  authorize(Role.ADMIN),
+  validateQuery(getTeachersSchema),
+  adminController.getTeachers.bind(adminController),
+);
+
+router.post(
+  ADMIN_ROUTES.TEACHERS,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(addTeacherSchema),
+  adminController.addTeacher.bind(adminController),
 );
 
 export default router;

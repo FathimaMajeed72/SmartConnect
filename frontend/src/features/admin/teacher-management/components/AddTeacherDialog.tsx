@@ -2,9 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 
-import { parentSchema, type ParentFormData } from "../schemas/parent.schema";
+import { teacherSchema, type TeacherFormData } from "../schemas/teacher.schema";
 
-import { createParent } from "../services/parent.service";
+import { createTeacher } from "../services/teacher.service";
 
 import FormDialog from "@/shared/components/FormDialog";
 import { Button } from "@/shared/ui/button";
@@ -14,34 +14,38 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/core/utils/getErrorMessage";
 import { useState } from "react";
 
-interface AddParentDialogProps {
+interface AddTeacherDialogProps {
   onSuccess?: () => void;
 }
 
-export default function AddParentDialog({ onSuccess }: AddParentDialogProps) {
+export default function AddTeacherDialog({ onSuccess }: AddTeacherDialogProps) {
   const [open, setOpen] = useState(false);
-  const form = useForm<ParentFormData>({
-    resolver: zodResolver(parentSchema),
+  const form = useForm<TeacherFormData>({
+    resolver: zodResolver(teacherSchema),
 
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
       phone: "",
+      qualification: "",
+      joiningDate: "",
     },
   });
 
-  const onSubmit = async (data: ParentFormData) => {
+  const onSubmit = async (data: TeacherFormData) => {
     try {
-      await createParent(data);
+      const result = await createTeacher(data);
 
-      toast.success("Parent created successfully.");
+      toast.success("Teacher invitation sent successfully.");
+
+      console.log("Created teacher user:", result.userId);
 
       form.reset();
       setOpen(false);
       onSuccess?.();
     } catch (error) {
-      console.error("Failed to create parent:", error);
+      console.error("Failed to create teacher:", error);
 
       toast.error(getErrorMessage(error));
     }
@@ -52,14 +56,14 @@ export default function AddParentDialog({ onSuccess }: AddParentDialogProps) {
       trigger={
         <Button>
           <Plus />
-          Add Parent
+          Add Teacher
         </Button>
       }
-      title="Add Parent"
-      description="Create a new parent account."
+      title="Add Teacher"
+      description="Create a new teacher account."
       onSubmit={form.handleSubmit(onSubmit)}
       isSubmitting={form.formState.isSubmitting}
-      submitLabel="Add Parent"
+      submitLabel="Add Teacher"
       submittingLabel="Adding..."
       open={open}
       onOpenChange={setOpen}
@@ -116,6 +120,35 @@ export default function AddParentDialog({ onSuccess }: AddParentDialogProps) {
         {form.formState.errors.phone && (
           <p className="text-sm text-destructive">
             {form.formState.errors.phone.message}
+          </p>
+        )}
+      </div>
+
+      {/* Qualification */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Qualification</label>
+
+        <Input
+          placeholder="Enter qualification"
+          {...form.register("qualification")}
+        />
+
+        {form.formState.errors.qualification && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.qualification.message}
+          </p>
+        )}
+      </div>
+
+      {/* Joining Date */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Joining Date</label>
+
+        <Input type="date" {...form.register("joiningDate")} />
+
+        {form.formState.errors.joiningDate && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.joiningDate.message}
           </p>
         )}
       </div>

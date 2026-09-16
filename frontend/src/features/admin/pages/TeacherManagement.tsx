@@ -16,22 +16,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import DataTable, { type DataTableColumn } from "@/shared/components/DataTable";
 
-import AddParentDialog from "@/features/admin/parent-management/components/AddParentDialog";
+import DataTable, {
+  type DataTableColumn,
+} from "@/shared/components/DataTable";
+
+import AddTeacherDialog from "@/features/admin/teacher-management/components/AddTeacherDialog";
+import TeacherStatusBadge from "@/features/admin/teacher-management/components/TeacherStatusBadge";
+
 import {
   USER_STATUS,
   type UserStatus,
 } from "@/features/admin/types/user-status";
 
-import { useParents } from "@/features/admin/parent-management/hooks/useParents";
-import ParentStatusBadge from "@/features/admin/parent-management/components/ParentStatusBadge";
+import { useTeachers } from "@/features/admin/teacher-management/hooks/useTeachers";
 
-import type { ParentListItem } from "@/features/admin/parent-management/types/parent.types";
+import type { TeacherListItem } from "@/features/admin/teacher-management/types/teacher.types";
 
-export default function ParentManagement() {
+export default function TeacherManagement() {
   const {
-    parents,
+    teachers,
     isLoading,
     total,
     page,
@@ -41,29 +45,48 @@ export default function ParentManagement() {
     setSearch,
     setStatusFilter,
     setPage,
-    fetchParents,
-  } = useParents();
+    fetchTeachers,
+  } = useTeachers();
 
-  const parentColumns: DataTableColumn<ParentListItem>[] = [
+  const teacherColumns: DataTableColumn<TeacherListItem>[] = [
     {
-      header: "Parent Name",
-      cell: (parent) => (
+      header: "Teacher ID",
+      cell: (teacher) => (
         <span className="font-medium">
-          {parent.firstName} {parent.lastName}
+          {teacher.teacherId}
+        </span>
+      ),
+    },
+    {
+      header: "Teacher Name",
+      cell: (teacher) => (
+        <span className="font-medium">
+          {teacher.firstName} {teacher.lastName}
         </span>
       ),
     },
     {
       header: "Email",
-      cell: (parent) => parent.email,
+      cell: (teacher) => teacher.email,
     },
     {
       header: "Phone",
-      cell: (parent) => parent.phone ?? "—",
+      cell: (teacher) => teacher.phone ?? "—",
+    },
+    {
+      header: "Qualification",
+      cell: (teacher) => teacher.qualification,
+    },
+    {
+      header: "Joining Date",
+      cell: (teacher) =>
+        new Date(teacher.joiningDate).toLocaleDateString(),
     },
     {
       header: "Status",
-      cell: (parent) => <ParentStatusBadge status={parent.status} />,
+      cell: (teacher) => (
+        <TeacherStatusBadge status={teacher.status} />
+      ),
     },
     {
       header: "Actions",
@@ -74,14 +97,20 @@ export default function ParentManagement() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MoreHorizontal />
-                <span className="sr-only">Open actions</span>
+                <span className="sr-only">
+                  Open actions
+                </span>
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>View</DropdownMenuItem>
+              <DropdownMenuItem>
+                View
+              </DropdownMenuItem>
 
-              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem>
+                Edit
+              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
@@ -100,32 +129,38 @@ export default function ParentManagement() {
       {/* Page Header */}
       <div>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Parent Management
+          Teacher Management
         </h2>
 
         <p className="text-muted-foreground">
-          Manage parents and their accounts.
+          Manage teachers and their accounts.
         </p>
       </div>
 
-      {/* Add Parent */}
+      {/* Add Teacher */}
       <div className="flex items-center justify-end">
-        <AddParentDialog onSuccess={fetchParents} />
+        <AddTeacherDialog
+          onSuccess={fetchTeachers}
+        />
       </div>
 
       {/* Search and Filter */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
-          placeholder="Search parents..."
+          placeholder="Search teachers..."
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) =>
+            setSearch(event.target.value)
+          }
           className="sm:max-w-sm"
         />
 
         <Select
           value={statusFilter}
           onValueChange={(value) =>
-            setStatusFilter(value as UserStatus | "ALL")
+            setStatusFilter(
+              value as UserStatus | "ALL",
+            )
           }
         >
           <SelectTrigger className="w-full sm:w-40">
@@ -133,26 +168,44 @@ export default function ParentManagement() {
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value="ALL">All Status</SelectItem>
-            <SelectItem value={USER_STATUS.INVITED}>Invited</SelectItem>
-            <SelectItem value={USER_STATUS.ACTIVE}>Active</SelectItem>
-            <SelectItem value={USER_STATUS.INACTIVE}>Inactive</SelectItem>
-            <SelectItem value={USER_STATUS.BLOCKED}>Blocked</SelectItem>
+            <SelectItem value="ALL">
+              All Status
+            </SelectItem>
+
+            <SelectItem value={USER_STATUS.INVITED}>
+              Invited
+            </SelectItem>
+
+            <SelectItem value={USER_STATUS.ACTIVE}>
+              Active
+            </SelectItem>
+
+            <SelectItem value={USER_STATUS.INACTIVE}>
+              Inactive
+            </SelectItem>
+
+            <SelectItem value={USER_STATUS.BLOCKED}>
+              Blocked
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Parents Table */}
+      {/* Teacher Table */}
       <DataTable
-        columns={parentColumns}
-        data={parents}
+        columns={teacherColumns}
+        data={teachers}
         isLoading={isLoading}
-        loadingMessage="Loading parents..."
-        emptyMessage="No parents found."
-        getRowKey={(parent) => parent.id}
+        loadingMessage="Loading teachers..."
+        emptyMessage="No teachers found."
+        getRowKey={(teacher) => teacher.id}
       />
+
+      {/* Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">Total: {total}</p>
+        <p className="text-sm text-muted-foreground">
+          Total: {total}
+        </p>
 
         <div className="flex items-center gap-2">
           <Button
@@ -169,7 +222,9 @@ export default function ParentManagement() {
 
           <Button
             variant="outline"
-            disabled={page === totalPages || isLoading}
+            disabled={
+              page === totalPages || isLoading
+            }
             onClick={() => setPage(page + 1)}
           >
             Next

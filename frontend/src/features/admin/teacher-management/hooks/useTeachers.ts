@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getParents } from "@/features/admin/parent-management/services/parent.service";
+import { getTeachers } from "../services/teacher.service";
+
 import type {
-  GetParentsParams,
-  ParentListItem,
-} from "../types/parent.types";
+  GetTeachersParams,
+  TeacherListItem,
+} from "../types/teacher.types";
 
-import { type UserStatus } from "@/features/admin/types/user-status";
+import {
+  type UserStatus,
+} from "@/features/admin/types/user-status";
 
-interface UseParentsReturn {
-  parents: ParentListItem[];
+interface UseTeachersReturn {
+  teachers: TeacherListItem[];
   isLoading: boolean;
   total: number;
   page: number;
@@ -20,11 +23,11 @@ interface UseParentsReturn {
   statusFilter: UserStatus | "ALL";
   setSearch: (search: string) => void;
   setStatusFilter: (status: UserStatus | "ALL") => void;
-  fetchParents: () => Promise<void>;
+  fetchTeachers: () => Promise<void>;
 }
 
-export function useParents(): UseParentsReturn {
-  const [parents, setParents] = useState<ParentListItem[]>([]);
+export function useTeachers(): UseTeachersReturn {
+  const [teachers, setTeachers] = useState<TeacherListItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -37,11 +40,11 @@ export function useParents(): UseParentsReturn {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchParents = useCallback(async () => {
+  const fetchTeachers = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      const params: GetParentsParams = {
+      const params: GetTeachersParams = {
         page,
         limit,
       };
@@ -54,29 +57,29 @@ export function useParents(): UseParentsReturn {
         params.status = statusFilter;
       }
 
-      const result = await getParents(params);
+      const result = await getTeachers(params);
 
-      setParents(result.parents);
+      setTeachers(result.teachers);
       setTotal(result.total);
       setPage(result.page);
       setTotalPages(result.totalPages);
     } catch (error) {
-      console.error("Failed to fetch parents:", error);
+      console.error("Failed to fetch teachers:", error);
     } finally {
       setIsLoading(false);
     }
   }, [page, limit, search, statusFilter]);
 
   useEffect(() => {
-    const loadParents = async () => {
-      await fetchParents();
+    const loadTeachers = async () => {
+      await fetchTeachers();
     };
 
-    loadParents();
-  }, [fetchParents]);
+    loadTeachers();
+  }, [fetchTeachers]);
 
   return {
-    parents,
+    teachers,
     isLoading,
     total,
     page,
@@ -87,6 +90,6 @@ export function useParents(): UseParentsReturn {
     statusFilter,
     setSearch,
     setStatusFilter,
-    fetchParents,
+    fetchTeachers,
   };
 }

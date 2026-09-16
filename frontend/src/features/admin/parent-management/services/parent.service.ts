@@ -3,9 +3,9 @@ import { API_ROUTES } from "@/core/constants/api-routes";
 
 import type {
   CreateParentRequest,
+  CreateParentResponse,
   GetParentsParams,
   PaginatedParents,
-  ParentListItem,
 } from "../types/parent.types";
 
 export const getParents = async (
@@ -20,7 +20,7 @@ export const getParents = async (
 
 export const createParent = async (
   data: CreateParentRequest,
-): Promise<ParentListItem> => {
+): Promise<CreateParentResponse> => {
   const response = await api.post(API_ROUTES.ADMIN.PARENTS, data);
 
   return response.data.data;

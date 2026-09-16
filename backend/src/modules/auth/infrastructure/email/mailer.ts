@@ -9,6 +9,10 @@ export const mailer = nodemailer.createTransport({
 
   secure: false,
 
+  pool: true,
+  maxConnections: 5,
+  maxMessages: 100,
+
   auth: {
     user: env.email.user,
     pass: env.email.password,

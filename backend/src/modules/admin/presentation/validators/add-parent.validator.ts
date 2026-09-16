@@ -9,7 +9,7 @@ export const addParentSchema = z.object({
   lastName: z
     .string()
     .trim()
-    .min(2, "Last name must be at least 2 characters."),
+    .min(1, "Last name is required."),
 
   email: z
     .string()

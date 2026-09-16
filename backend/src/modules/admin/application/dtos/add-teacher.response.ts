@@ -1,4 +1,4 @@
-export interface AddParentResponse {
+export interface AddTeacherResponse {
   message: string;
   userId: string;
 }

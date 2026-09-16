@@ -45,6 +45,8 @@ export class NodemailerEmailService implements IAuthEmailService {
         const template =
             buildPasswordResetOtpEmail(firstName, otp);
 
+             console.time("OTP email sending");
+
         await mailer.sendMail({
             from: env.email.from,
 
@@ -56,6 +58,8 @@ export class NodemailerEmailService implements IAuthEmailService {
 
             html: template.html,
         });
+
+         console.timeEnd("OTP email sending");
 
     }
 }

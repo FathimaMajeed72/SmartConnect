@@ -96,6 +96,7 @@ export class InviteUserUseCase implements IInviteUserUseCase {
 
     return {
       message: "Invitation email sent successfully.",
+      userId: createdUser.id,
     };
 
     

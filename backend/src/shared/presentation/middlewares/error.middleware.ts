@@ -5,22 +5,12 @@ import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { ApplicationError } from "../../errors/application.error";
 import { HttpStatusCode } from "../../enums/http-status-code.enum";
 import { IErrorStatusMapper } from "../interfaces/error-status-mapper.interface";
+import { sendError } from "../helpers/response.helper";
 
-export function errorMiddleware(
-  errorStatusMapper: IErrorStatusMapper,
-) {
-  return (
-    error: Error,
-    _req: Request,
-    res: Response,
-    _next: NextFunction,
-  ): void => {
+export function errorMiddleware(errorStatusMapper: IErrorStatusMapper) {
+  return (error: Error, _req: Request, res: Response, _next: NextFunction): void => {
     if (error instanceof ZodError) {
-      res.status(HttpStatusCode.BAD_REQUEST).json({
-        success: false,
-        message: "Validation failed.",
-        errors: error.flatten().fieldErrors,
-      });
+      sendError(res, HttpStatusCode.BAD_REQUEST, "Validation failed.", error.flatten().fieldErrors);
 
       return;
     }
@@ -29,38 +19,26 @@ export function errorMiddleware(
       const statusCode = errorStatusMapper.getStatusCode(error.code);
 
       if (statusCode) {
-        res.status(statusCode).json({
-          success: false,
-          message: error.message,
-        });
+        sendError(res, statusCode, error.message);
 
         return;
       }
     }
 
     if (error instanceof TokenExpiredError) {
-      res.status(HttpStatusCode.UNAUTHORIZED).json({
-        success: false,
-        message: "Access token has expired.",
-      });
+      sendError(res, HttpStatusCode.UNAUTHORIZED, "Access token has expired.");
 
       return;
     }
 
     if (error instanceof JsonWebTokenError) {
-      res.status(HttpStatusCode.UNAUTHORIZED).json({
-        success: false,
-        message: "Invalid access token.",
-      });
+      sendError(res, HttpStatusCode.UNAUTHORIZED, "Invalid access token.");
 
       return;
     }
 
     console.error(error);
 
-    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    sendError(res, HttpStatusCode.INTERNAL_SERVER_ERROR, "Internal Server Error");
   };
 }

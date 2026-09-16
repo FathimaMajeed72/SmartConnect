@@ -14,6 +14,7 @@ import RoleProtectedRoute from "@/shared/components/RoleProtectedRoute";
 import UnauthorizedPage from "@/shared/pages/UnauthorizedPage";
 import ParentManagement from "@/features/admin/pages/ParentManagement";
 import ActivateAccountPage from "@/features/auth/pages/ActivateAccountPage";
+import TeacherManagement from "@/features/admin/pages/TeacherManagement";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
               {
                 path: "/admin/parents",
                 element: <ParentManagement />,
+              },
+              {
+                path: "/admin/teachers",
+                element: <TeacherManagement />,
               },
             ],
           },
