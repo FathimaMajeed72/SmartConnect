@@ -16,7 +16,10 @@ export function errorMiddleware(errorStatusMapper: IErrorStatusMapper) {
     }
 
     if (error instanceof ApplicationError) {
+      console.log("ERROR CLASS:", error.constructor.name);
+      console.log("ERROR CODE:", error.code);
       const statusCode = errorStatusMapper.getStatusCode(error.code);
+      console.log("MAPPED STATUS:", statusCode);
 
       if (statusCode) {
         sendError(res, statusCode, error.message);

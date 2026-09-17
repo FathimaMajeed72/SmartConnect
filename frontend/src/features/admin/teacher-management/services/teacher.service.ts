@@ -6,6 +6,9 @@ import type {
   CreateTeacherResponse,
   GetTeachersParams,
   PaginatedTeachers,
+  TeacherDetails,
+  UpdateTeacherRequest,
+  UpdateTeacherResponse,
 } from "../types/teacher.types";
 
 export const getTeachers = async (
@@ -26,6 +29,28 @@ export const createTeacher = async (
 ): Promise<CreateTeacherResponse> => {
   const response = await api.post(
     API_ROUTES.ADMIN.TEACHERS,
+    data,
+  );
+
+  return response.data.data;
+};
+
+export const getTeacherById = async (
+  id: string,
+): Promise<TeacherDetails> => {
+  const response = await api.get(
+    `${API_ROUTES.ADMIN.TEACHERS}/${id}`,
+  );
+
+  return response.data.data;
+};
+
+export const updateTeacher = async (
+  id: string,
+  data: UpdateTeacherRequest,
+): Promise<UpdateTeacherResponse> => {
+  const response = await api.patch(
+    `${API_ROUTES.ADMIN.TEACHERS}/${id}`,
     data,
   );
 

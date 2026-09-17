@@ -39,7 +39,6 @@ export class AddTeacherUseCase implements IAddTeacherUseCase {
     await this._teacherRepository.create(teacher);
 
     return {
-      message: userResult.message,
       userId: userResult.userId,
     };
   }

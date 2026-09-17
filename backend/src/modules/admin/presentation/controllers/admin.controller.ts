@@ -7,7 +7,10 @@ import { IGetParentsUseCase } from "../../application/use-case-interfaces/get-pa
 import { IAddParentUseCase } from "../../application/use-case-interfaces/add-parent.use-case.interface";
 import { IGetTeachersUseCase } from "../../application/use-case-interfaces/get-teachers.use-case.interface";
 import { IAddTeacherUseCase } from "../../application/use-case-interfaces/add-teacher.use-case.interface";
-import { sendSuccess } from "../../../../shared/presentation/helpers/response.helper";
+import { IGetTeacherUseCase } from "../../application/use-case-interfaces/get-teacher.use-case.interface";
+import { IUpdateTeacherUseCase } from "../../application/use-case-interfaces/update-teacher.use-case.interface";
+import { sendError, sendSuccess } from "../../../../shared/presentation/helpers/response.helper";
+import { Types } from "mongoose";
 
 export class AdminController {
   constructor(
@@ -15,6 +18,8 @@ export class AdminController {
     private readonly _addParentUseCase: IAddParentUseCase,
     private readonly _getTeachersUseCase: IGetTeachersUseCase,
     private readonly _addTeacherUseCase: IAddTeacherUseCase,
+    private readonly _getTeacherUseCase: IGetTeacherUseCase,
+    private readonly _updateTeacherUseCase: IUpdateTeacherUseCase,
   ) {}
 
   async getParents(req: ValidatedQueryRequest, res: Response, next: NextFunction): Promise<void> {
@@ -76,6 +81,55 @@ export class AdminController {
       const result = await this._addTeacherUseCase.execute(req.body);
 
       sendSuccess(res, HttpStatusCode.CREATED, "Teacher invitation sent successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getTeacher(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      if (typeof id !== "string") {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid teacher id.");
+        return;
+      }
+
+      if (!Types.ObjectId.isValid(id)) {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid teacher id.");
+        return;
+      }
+
+      const result = await this._getTeacherUseCase.execute(id);
+
+      if (!result) {
+        sendError(res, HttpStatusCode.NOT_FOUND, "Teacher not found.");
+        return;
+      }
+
+      sendSuccess(res, HttpStatusCode.OK, "Teacher retrieved successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateTeacher(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      if (typeof id !== "string") {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid teacher id.");
+        return;
+      }
+
+      if (!Types.ObjectId.isValid(id)) {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid teacher id.");
+        return;
+      }
+
+      const result = await this._updateTeacherUseCase.execute(id, req.body);
+
+      sendSuccess(res, HttpStatusCode.OK, "Teacher updated successfully.", result);
     } catch (error) {
       next(error);
     }

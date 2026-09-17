@@ -17,9 +17,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import DataTable, {
-  type DataTableColumn,
-} from "@/shared/components/DataTable";
+import DataTable, { type DataTableColumn } from "@/shared/components/DataTable";
 
 import AddTeacherDialog from "@/features/admin/teacher-management/components/AddTeacherDialog";
 import TeacherStatusBadge from "@/features/admin/teacher-management/components/TeacherStatusBadge";
@@ -32,6 +30,10 @@ import {
 import { useTeachers } from "@/features/admin/teacher-management/hooks/useTeachers";
 
 import type { TeacherListItem } from "@/features/admin/teacher-management/types/teacher.types";
+import ViewTeacherDialog from "../teacher-management/components/ViewTeacherDialog";
+import { useState } from "react";
+
+import EditTeacherDialog from "@/features/admin/teacher-management/components/EditTeacherDialog";
 
 export default function TeacherManagement() {
   const {
@@ -48,13 +50,19 @@ export default function TeacherManagement() {
     fetchTeachers,
   } = useTeachers();
 
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string | null>(
+    null,
+  );
+
+  const [isViewTeacherOpen, setIsViewTeacherOpen] = useState(false);
+
+  const [isEditTeacherOpen, setIsEditTeacherOpen] = useState(false);
+
   const teacherColumns: DataTableColumn<TeacherListItem>[] = [
     {
       header: "Teacher ID",
       cell: (teacher) => (
-        <span className="font-medium">
-          {teacher.teacherId}
-        </span>
+        <span className="font-medium">{teacher.teacherId}</span>
       ),
     },
     {
@@ -79,36 +87,41 @@ export default function TeacherManagement() {
     },
     {
       header: "Joining Date",
-      cell: (teacher) =>
-        new Date(teacher.joiningDate).toLocaleDateString(),
+      cell: (teacher) => new Date(teacher.joiningDate).toLocaleDateString(),
     },
     {
       header: "Status",
-      cell: (teacher) => (
-        <TeacherStatusBadge status={teacher.status} />
-      ),
+      cell: (teacher) => <TeacherStatusBadge status={teacher.status} />,
     },
     {
       header: "Actions",
       className: "text-right",
-      cell: () => (
+      cell: (teacher) => (
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MoreHorizontal />
-                <span className="sr-only">
-                  Open actions
-                </span>
+                <span className="sr-only">Open actions</span>
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedTeacherId(teacher.id);
+                  setIsViewTeacherOpen(true);
+                }}
+              >
                 View
               </DropdownMenuItem>
 
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedTeacherId(teacher.id);
+                  setIsEditTeacherOpen(true);
+                }}
+              >
                 Edit
               </DropdownMenuItem>
 
@@ -139,9 +152,7 @@ export default function TeacherManagement() {
 
       {/* Add Teacher */}
       <div className="flex items-center justify-end">
-        <AddTeacherDialog
-          onSuccess={fetchTeachers}
-        />
+        <AddTeacherDialog onSuccess={fetchTeachers} />
       </div>
 
       {/* Search and Filter */}
@@ -149,18 +160,14 @@ export default function TeacherManagement() {
         <Input
           placeholder="Search teachers..."
           value={search}
-          onChange={(event) =>
-            setSearch(event.target.value)
-          }
+          onChange={(event) => setSearch(event.target.value)}
           className="sm:max-w-sm"
         />
 
         <Select
           value={statusFilter}
           onValueChange={(value) =>
-            setStatusFilter(
-              value as UserStatus | "ALL",
-            )
+            setStatusFilter(value as UserStatus | "ALL")
           }
         >
           <SelectTrigger className="w-full sm:w-40">
@@ -168,25 +175,15 @@ export default function TeacherManagement() {
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value="ALL">
-              All Status
-            </SelectItem>
+            <SelectItem value="ALL">All Status</SelectItem>
 
-            <SelectItem value={USER_STATUS.INVITED}>
-              Invited
-            </SelectItem>
+            <SelectItem value={USER_STATUS.INVITED}>Invited</SelectItem>
 
-            <SelectItem value={USER_STATUS.ACTIVE}>
-              Active
-            </SelectItem>
+            <SelectItem value={USER_STATUS.ACTIVE}>Active</SelectItem>
 
-            <SelectItem value={USER_STATUS.INACTIVE}>
-              Inactive
-            </SelectItem>
+            <SelectItem value={USER_STATUS.INACTIVE}>Inactive</SelectItem>
 
-            <SelectItem value={USER_STATUS.BLOCKED}>
-              Blocked
-            </SelectItem>
+            <SelectItem value={USER_STATUS.BLOCKED}>Blocked</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -203,9 +200,7 @@ export default function TeacherManagement() {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Total: {total}
-        </p>
+        <p className="text-sm text-muted-foreground">Total: {total}</p>
 
         <div className="flex items-center gap-2">
           <Button
@@ -222,15 +217,28 @@ export default function TeacherManagement() {
 
           <Button
             variant="outline"
-            disabled={
-              page === totalPages || isLoading
-            }
+            disabled={page === totalPages || isLoading}
             onClick={() => setPage(page + 1)}
           >
             Next
           </Button>
         </div>
       </div>
+      {selectedTeacherId && (
+        <ViewTeacherDialog
+          teacherId={selectedTeacherId}
+          open={isViewTeacherOpen}
+          onOpenChange={setIsViewTeacherOpen}
+        />
+      )}
+      {selectedTeacherId && (
+        <EditTeacherDialog
+          teacherId={selectedTeacherId}
+          open={isEditTeacherOpen}
+          onOpenChange={setIsEditTeacherOpen}
+          onSuccess={fetchTeachers}
+        />
+      )}
     </div>
   );
 }

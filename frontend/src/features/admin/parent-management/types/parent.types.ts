@@ -33,6 +33,5 @@ export interface CreateParentRequest {
 }
 
 export interface CreateParentResponse {
-  message: string;
   userId: string;
 }

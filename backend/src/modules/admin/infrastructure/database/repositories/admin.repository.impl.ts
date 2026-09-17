@@ -14,7 +14,7 @@ import {
 } from "../../../application/types/get-teachers-response.type";
 import { Types } from "mongoose";
 import { UserStatus } from "../../../../auth/domain/enums/user-status.enum";
-
+import { TeacherDetails } from "../../../application/types/get-teacher-response.type";
 
 interface TeacherAggregationResult {
   _id: Types.ObjectId;
@@ -39,7 +39,6 @@ interface TeacherFacetResult {
     count: number;
   }[];
 }
-
 
 export class AdminRepositoryImpl implements IAdminRepository {
   async getParents(query: GetParentsQuery): Promise<PaginatedParents> {
@@ -206,6 +205,56 @@ export class AdminRepositoryImpl implements IAdminRepository {
       limit,
       total,
       totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getTeacherById(id: string): Promise<TeacherDetails | null> {
+    if (!Types.ObjectId.isValid(id)) {
+      return null;
+    }
+
+    console.log("getTeacherById id:", id);
+
+    const objectId = new Types.ObjectId(id);
+
+    console.log("objectId:", objectId);
+
+    const [document] = await UserModel.aggregate<TeacherAggregationResult>([
+      {
+        $match: {
+          _id: new Types.ObjectId(id),
+          role: Role.TEACHER,
+        },
+      },
+
+      {
+        $lookup: {
+          from: "teachers",
+          localField: "_id",
+          foreignField: "userId",
+          as: "teacher",
+        },
+      },
+
+      {
+        $unwind: "$teacher",
+      },
+    ]);
+
+    if (!document) {
+      return null;
+    }
+
+    return {
+      id: document._id.toString(),
+      teacherId: document.teacher.teacherId,
+      firstName: document.firstName,
+      lastName: document.lastName,
+      email: document.email,
+      phone: document.phone,
+      qualification: document.teacher.qualification,
+      joiningDate: document.teacher.joiningDate,
+      status: document.status,
     };
   }
 }

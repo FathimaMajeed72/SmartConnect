@@ -12,7 +12,7 @@ import {
 } from "@/shared/ui/dialog";
 
 interface FormDialogProps {
-  trigger: ReactNode;
+  trigger?: ReactNode;
   title: string;
   description?: string;
   children: ReactNode;
@@ -39,32 +39,21 @@ export default function FormDialog({
 }: FormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
 
-          {description && (
-            <DialogDescription>
-              {description}
-            </DialogDescription>
-          )}
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-4">
           {children}
 
           <DialogFooter>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? submittingLabel
-                : submitLabel}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? submittingLabel : submitLabel}
             </Button>
           </DialogFooter>
         </form>

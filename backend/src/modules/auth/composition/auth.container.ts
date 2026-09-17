@@ -21,7 +21,7 @@ import { VerifyResetOtpUseCase } from "../application/use-cases/verify-reset-otp
 import { ResetPasswordUseCase } from "../application/use-cases/reset-password.use-case";
 import { ResendResetOtpUseCase } from "../application/use-cases/resend-reset-otp.use-case";
 
-const userRepository = new UserRepositoryImpl();
+export const userRepository = new UserRepositoryImpl();
 
 const userTokenRepository = new UserTokenRepositoryImpl();
 

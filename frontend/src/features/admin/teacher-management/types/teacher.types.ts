@@ -57,6 +57,30 @@ export interface CreateTeacherRequest {
 }
 
 export interface CreateTeacherResponse {
-  message: string;
+  userId: string;
+}
+
+export interface TeacherDetails {
+  id: string;
+  teacherId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  qualification: string;
+  joiningDate: string;
+  status: UserStatus;
+}
+
+export interface UpdateTeacherRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  qualification: string;
+  joiningDate: string;
+}
+
+export interface UpdateTeacherResponse {
   userId: string;
 }

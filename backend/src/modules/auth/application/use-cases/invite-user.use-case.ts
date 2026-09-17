@@ -8,7 +8,7 @@ import { IRandomTokenGenerator } from "../interfaces/random-token-generator.inte
 import { ITokenHasher } from "../interfaces/token-hasher.interface";
 import { IAuthEmailService } from "../interfaces/auth-email.service.interface";
 
-import { EmailAlreadyExistsError } from "../errors/email-already-exists.error";
+import { EmailAlreadyExistsError } from "../../../../shared/errors/email-already-exists.error"; 
 
 import { User } from "../../domain/entities/user.entity";
 import { UserToken } from "../../domain/entities/user-token.entity";
@@ -95,7 +95,6 @@ export class InviteUserUseCase implements IInviteUserUseCase {
     );
 
     return {
-      message: "Invitation email sent successfully.",
       userId: createdUser.id,
     };
 

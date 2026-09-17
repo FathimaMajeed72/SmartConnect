@@ -12,9 +12,6 @@ export class AuthErrorStatusMapper implements IErrorStatusMapper {
     [AuthErrorCode.ACTIVATION_TOKEN_EXPIRED]:
       HttpStatusCode.BAD_REQUEST,
 
-    [AuthErrorCode.EMAIL_ALREADY_EXISTS]:
-      HttpStatusCode.CONFLICT,
-
     [AuthErrorCode.INVALID_ACTIVATION_TOKEN]:
       HttpStatusCode.BAD_REQUEST,
 

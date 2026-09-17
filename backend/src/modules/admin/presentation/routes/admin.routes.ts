@@ -11,6 +11,7 @@ import { getTeachersSchema } from "../validators/get-teachers.validator";
 import { addTeacherSchema } from "../validators/add-teacher.validator";
 
 import { ADMIN_ROUTES } from "./admin.routes.constants";
+import { updateTeacherSchema } from "../validators/update-teacher.validator";
 
 const router = Router();
 
@@ -44,6 +45,21 @@ router.post(
   authorize(Role.ADMIN),
   validate(addTeacherSchema),
   adminController.addTeacher.bind(adminController),
+);
+
+router.get(
+  `${ADMIN_ROUTES.TEACHERS}/:id`,
+  authenticate,
+  authorize(Role.ADMIN),
+  adminController.getTeacher.bind(adminController),
+);
+
+router.patch(
+  `${ADMIN_ROUTES.TEACHERS}/:id`,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(updateTeacherSchema),
+  adminController.updateTeacher.bind(adminController),
 );
 
 export default router;
