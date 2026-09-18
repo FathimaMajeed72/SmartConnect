@@ -11,6 +11,7 @@ import { IResetPasswordUseCase } from "../../application/use-case-interfaces/res
 import { IResendResetOtpUseCase } from "../../application/use-case-interfaces/resend-reset-otp.use-case.interface";
 import { HttpStatusCode } from "../../../../shared/enums/http-status-code.enum";
 import { sendSuccess, sendError } from "../../../../shared/presentation/helpers/response.helper";
+import { env } from "../../../../config/env";
 
 export class AuthController {
   constructor(
@@ -53,7 +54,7 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: env.refreshTokenExpiresInDays * 24 * 60 * 60 * 1000,
       });
 
       sendSuccess(res, HttpStatusCode.OK, "Login successful.", {
