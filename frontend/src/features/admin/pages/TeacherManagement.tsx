@@ -34,6 +34,13 @@ import ViewTeacherDialog from "../teacher-management/components/ViewTeacherDialo
 import { useState } from "react";
 
 import EditTeacherDialog from "@/features/admin/teacher-management/components/EditTeacherDialog";
+import { toast } from "sonner";
+import {
+  updateTeacherStatus,
+  resendTeacherInvitation,
+} from "../teacher-management/services/teacher.service";
+import UpdateTeacherStatusDialog from "../teacher-management/components/UpdateTeacherStatusDialog";
+import ResendTeacherInvitationDialog from "../teacher-management/components/ResendTeacherInvitationDialog";
 
 export default function TeacherManagement() {
   const {
@@ -57,6 +64,74 @@ export default function TeacherManagement() {
   const [isViewTeacherOpen, setIsViewTeacherOpen] = useState(false);
 
   const [isEditTeacherOpen, setIsEditTeacherOpen] = useState(false);
+
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+
+  const [selectedTeacherForStatus, setSelectedTeacherForStatus] =
+    useState<TeacherListItem | null>(null);
+
+  const [selectedStatus, setSelectedStatus] = useState<UserStatus | null>(null);
+
+  const [isResendInvitationOpen, setIsResendInvitationOpen] = useState(false);
+
+  const [selectedTeacherForResend, setSelectedTeacherForResend] =
+    useState<TeacherListItem | null>(null);
+
+  const handleStatusAction = (teacher: TeacherListItem, status: UserStatus) => {
+    setSelectedTeacherForStatus(teacher);
+    setSelectedStatus(status);
+    setIsStatusDialogOpen(true);
+  };
+
+  const handleConfirmStatus = async () => {
+    if (!selectedTeacherForStatus || !selectedStatus) {
+      return;
+    }
+
+    try {
+      await updateTeacherStatus(selectedTeacherForStatus.id, {
+        status: selectedStatus,
+      });
+
+      toast.success("Teacher status updated successfully.");
+
+      setIsStatusDialogOpen(false);
+      setSelectedTeacherForStatus(null);
+      setSelectedStatus(null);
+
+      await fetchTeachers();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update teacher status.");
+    }
+  };
+
+
+  const handleOpenResendInvitation = (teacher: TeacherListItem) => {
+    setSelectedTeacherForResend(teacher);
+    setIsResendInvitationOpen(true);
+  };
+
+  const handleConfirmResendInvitation = async () => {
+    if (!selectedTeacherForResend) {
+      return;
+    }
+
+    try {
+      await resendTeacherInvitation(selectedTeacherForResend.id);
+
+      toast.success("Teacher invitation resent successfully.");
+
+      setIsResendInvitationOpen(false);
+      setSelectedTeacherForResend(null);
+
+      await fetchTeachers();
+    } catch (error) {
+      console.error("Failed to resend teacher invitation:", error);
+
+      toast.error("Failed to resend teacher invitation.");
+    }
+  };
 
   const teacherColumns: DataTableColumn<TeacherListItem>[] = [
     {
@@ -127,9 +202,53 @@ export default function TeacherManagement() {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="text-destructive">
-                Block
-              </DropdownMenuItem>
+              {teacher.status === "ACTIVE" && (
+                <>
+                  <DropdownMenuItem
+                    onClick={() => handleStatusAction(teacher, "INACTIVE")}
+                  >
+                    Deactivate
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => handleStatusAction(teacher, "BLOCKED")}
+                  >
+                    Block
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {teacher.status === "INACTIVE" && (
+                <>
+                  <DropdownMenuItem
+                    onClick={() => handleStatusAction(teacher, "ACTIVE")}
+                  >
+                    Activate
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => handleStatusAction(teacher, "BLOCKED")}
+                  >
+                    Block
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {teacher.status === "BLOCKED" && (
+                <DropdownMenuItem
+                  onClick={() => handleStatusAction(teacher, "ACTIVE")}
+                >
+                  Activate
+                </DropdownMenuItem>
+              )}
+
+              {teacher.status === "INVITED" && (
+                <DropdownMenuItem
+                  onClick={() => handleOpenResendInvitation(teacher)}
+                >
+                  Resend Invitation
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -237,6 +356,24 @@ export default function TeacherManagement() {
           open={isEditTeacherOpen}
           onOpenChange={setIsEditTeacherOpen}
           onSuccess={fetchTeachers}
+        />
+      )}
+      {selectedTeacherForStatus && selectedStatus && (
+        <UpdateTeacherStatusDialog
+          open={isStatusDialogOpen}
+          onOpenChange={setIsStatusDialogOpen}
+          teacherName={`${selectedTeacherForStatus.firstName} ${selectedTeacherForStatus.lastName}`}
+          status={selectedStatus}
+          onConfirm={handleConfirmStatus}
+        />
+      )}
+
+      {selectedTeacherForResend && (
+        <ResendTeacherInvitationDialog
+          open={isResendInvitationOpen}
+          onOpenChange={setIsResendInvitationOpen}
+          teacherName={`${selectedTeacherForResend.firstName} ${selectedTeacherForResend.lastName}`}
+          onConfirm={handleConfirmResendInvitation}
         />
       )}
     </div>

@@ -16,7 +16,7 @@ export function buildPasswordResetOtpEmail(
 
     ${otp}
 
-    This code expires in 10 minutes.
+    This code expires in 1 minute.
 
     If you didn't request a password reset, you can safely ignore this email.
     `,
@@ -30,7 +30,7 @@ export function buildPasswordResetOtpEmail(
 
     <h1>${otp}</h1>
 
-    <p>This OTP is valid for 10 minutes.</p>
+    <p>This OTP is valid for 1 minute.</p>
 
     <p>
     If you didn't request a password reset, you can safely ignore this email.

@@ -11,6 +11,8 @@ import { IGetTeacherUseCase } from "../../application/use-case-interfaces/get-te
 import { IUpdateTeacherUseCase } from "../../application/use-case-interfaces/update-teacher.use-case.interface";
 import { sendError, sendSuccess } from "../../../../shared/presentation/helpers/response.helper";
 import { Types } from "mongoose";
+import { IUpdateTeacherStatusUseCase } from "../../application/use-case-interfaces/update-teacher-status.use-case.interface";
+import { IResendTeacherInvitationUseCase } from "../../application/use-case-interfaces/resend-teacher-invitation.use-case.interface";
 
 export class AdminController {
   constructor(
@@ -20,6 +22,8 @@ export class AdminController {
     private readonly _addTeacherUseCase: IAddTeacherUseCase,
     private readonly _getTeacherUseCase: IGetTeacherUseCase,
     private readonly _updateTeacherUseCase: IUpdateTeacherUseCase,
+    private readonly _updateTeacherStatusUseCase: IUpdateTeacherStatusUseCase,
+    private readonly _resendTeacherInvitationUseCase: IResendTeacherInvitationUseCase,
   ) {}
 
   async getParents(req: ValidatedQueryRequest, res: Response, next: NextFunction): Promise<void> {
@@ -134,4 +138,64 @@ export class AdminController {
       next(error);
     }
   }
+
+  async updateTeacherStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      if (typeof id !== "string") {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid teacher id.");
+        return;
+      }
+
+      if (!Types.ObjectId.isValid(id)) {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid teacher id.");
+        return;
+      }
+
+      const result = await this._updateTeacherStatusUseCase.execute(id, req.body);
+
+      sendSuccess(res, HttpStatusCode.OK, "Teacher status updated successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendTeacherInvitation(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { id } = req.params;
+
+    if (typeof id !== "string") {
+      sendError(
+        res,
+        HttpStatusCode.BAD_REQUEST,
+        "Invalid teacher ID.",
+      );
+      return;
+    }
+
+    if (!Types.ObjectId.isValid(id)) {
+      sendError(
+        res,
+        HttpStatusCode.BAD_REQUEST,
+        "Invalid teacher ID.",
+      );
+      return;
+    }
+
+    await this._resendTeacherInvitationUseCase.execute(id);
+
+    sendSuccess(
+      res,
+      HttpStatusCode.OK,
+      "Teacher invitation resent successfully.",
+    );
+  } catch (error) {
+    next(error);
+  }
+}
 }

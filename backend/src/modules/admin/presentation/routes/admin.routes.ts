@@ -12,6 +12,7 @@ import { addTeacherSchema } from "../validators/add-teacher.validator";
 
 import { ADMIN_ROUTES } from "./admin.routes.constants";
 import { updateTeacherSchema } from "../validators/update-teacher.validator";
+import { updateTeacherStatusSchema } from "../validators/update-teacher-status.validator";
 
 const router = Router();
 
@@ -60,6 +61,21 @@ router.patch(
   authorize(Role.ADMIN),
   validate(updateTeacherSchema),
   adminController.updateTeacher.bind(adminController),
+);
+
+router.patch(
+  `${ADMIN_ROUTES.TEACHERS}/:id/status`,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(updateTeacherStatusSchema),
+  adminController.updateTeacherStatus.bind(adminController),
+);
+
+router.post(
+  `${ADMIN_ROUTES.TEACHERS}/:id/resend-invitation`,
+  authenticate,
+  authorize(Role.ADMIN),
+  adminController.resendTeacherInvitation.bind(adminController),
 );
 
 export default router;

@@ -84,3 +84,12 @@ export interface UpdateTeacherRequest {
 export interface UpdateTeacherResponse {
   userId: string;
 }
+
+export interface UpdateTeacherStatusRequest {
+  status: UserStatus;
+}
+
+export interface UpdateTeacherStatusResponse {
+  userId: string;
+  status: UserStatus;
+}

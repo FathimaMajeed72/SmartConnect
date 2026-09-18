@@ -23,15 +23,15 @@ import { ResendResetOtpUseCase } from "../application/use-cases/resend-reset-otp
 
 export const userRepository = new UserRepositoryImpl();
 
-const userTokenRepository = new UserTokenRepositoryImpl();
+export const userTokenRepository = new UserTokenRepositoryImpl();
 
-const randomTokenGenerator = new CryptoRandomTokenGenerator();
+export const randomTokenGenerator = new CryptoRandomTokenGenerator();
 
-const tokenHasher = new Sha256TokenHasher();
+export const tokenHasher = new Sha256TokenHasher();
 
 const otpGenerator = new SixDigitOtpGenerator();
 
-const emailService = new NodemailerEmailService();
+export const emailService = new NodemailerEmailService();
 
 const passwordHasher = new BcryptPasswordHasher();
 

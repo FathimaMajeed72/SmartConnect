@@ -27,7 +27,7 @@ const envSchema = z.object({
 
   REFRESH_TOKEN_EXPIRES_IN_DAYS: z.coerce.number().positive().default(7 ),
 
-  RESET_PASSWORD_OTP_EXPIRES_IN_MINUTES: z.coerce.number().positive().default(10),
+  RESET_PASSWORD_OTP_EXPIRES_IN_MINUTES: z.coerce.number().positive().default(1),
 
   EMAIL_HOST: z.string().min(1),
 
