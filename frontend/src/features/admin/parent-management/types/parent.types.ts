@@ -35,3 +35,36 @@ export interface CreateParentRequest {
 export interface CreateParentResponse {
   userId: string;
 }
+
+export interface ParentDetails {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  status: UserStatus;
+  isEmailVerified: boolean;
+  lastLogin: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateParentRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+}
+
+export interface UpdateParentResponse {
+  userId: string;
+}
+
+export interface UpdateParentStatusRequest {
+  status: UserStatus;
+}
+
+export interface UpdateParentStatusResponse {
+  userId: string;
+  status: UserStatus;
+}

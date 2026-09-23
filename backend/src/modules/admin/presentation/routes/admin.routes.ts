@@ -13,6 +13,8 @@ import { addTeacherSchema } from "../validators/add-teacher.validator";
 import { ADMIN_ROUTES } from "./admin.routes.constants";
 import { updateTeacherSchema } from "../validators/update-teacher.validator";
 import { updateTeacherStatusSchema } from "../validators/update-teacher-status.validator";
+import { updateParentSchema } from "../validators/update-parent.validator";
+import { updateParentStatusSchema } from "../validators/update-parent-status.validator";
 
 const router = Router();
 
@@ -30,6 +32,36 @@ router.post(
   authorize(Role.ADMIN),
   validate(addParentSchema),
   adminController.addParent.bind(adminController),
+);
+
+router.get(
+  `${ADMIN_ROUTES.PARENTS}/:id`,
+  authenticate,
+  authorize(Role.ADMIN),
+  adminController.getParent.bind(adminController),
+);
+
+router.patch(
+  `${ADMIN_ROUTES.PARENTS}/:id`,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(updateParentSchema),
+  adminController.updateParent.bind(adminController),
+);
+
+router.patch(
+  `${ADMIN_ROUTES.PARENTS}/:id/status`,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(updateParentStatusSchema),
+  adminController.updateParentStatus.bind(adminController),
+);
+
+router.post(
+  `${ADMIN_ROUTES.PARENTS}/:id/resend-invitation`,
+  authenticate,
+  authorize(Role.ADMIN),
+  adminController.resendInvitation.bind(adminController),
 );
 
 router.get(
@@ -75,7 +107,7 @@ router.post(
   `${ADMIN_ROUTES.TEACHERS}/:id/resend-invitation`,
   authenticate,
   authorize(Role.ADMIN),
-  adminController.resendTeacherInvitation.bind(adminController),
+  adminController.resendInvitation.bind(adminController),
 );
 
 export default router;

@@ -57,7 +57,7 @@ export abstract class BaseRepositoryImpl<
 
     if (!document) {
       throw new Error("Entity not found.");
-    }
+    } 
 
     return this.toDomain(document);
   }

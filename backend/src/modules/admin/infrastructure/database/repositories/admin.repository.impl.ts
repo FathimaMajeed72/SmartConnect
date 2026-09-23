@@ -15,6 +15,7 @@ import {
 import { Types } from "mongoose";
 import { UserStatus } from "../../../../auth/domain/enums/user-status.enum";
 import { TeacherDetails } from "../../../application/types/get-teacher-response.type";
+import { ParentDetails } from "../../../application/types/get-parent-response.type";
 
 interface TeacherAggregationResult {
   _id: Types.ObjectId;
@@ -99,6 +100,34 @@ export class AdminRepositoryImpl implements IAdminRepository {
       limit,
       total,
       totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getParentById(id: string): Promise<ParentDetails | null> {
+    if (!Types.ObjectId.isValid(id)) {
+      return null;
+    }
+
+    const document = await UserModel.findOne({
+      _id: id,
+      role: Role.PARENT,
+    });
+
+    if (!document) {
+      return null;
+    }
+
+    return {
+      id: document.id,
+      firstName: document.firstName,
+      lastName: document.lastName,
+      email: document.email,
+      phone: document.phone,
+      status: document.status,
+      isEmailVerified: document.isEmailVerified,
+      lastLogin: document.lastLogin ?? null,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
     };
   }
 

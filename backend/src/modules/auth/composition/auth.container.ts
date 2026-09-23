@@ -20,6 +20,7 @@ import { SixDigitOtpGenerator } from "../infrastructure/security/six-digit-otp-g
 import { VerifyResetOtpUseCase } from "../application/use-cases/verify-reset-otp.use-case";
 import { ResetPasswordUseCase } from "../application/use-cases/reset-password.use-case";
 import { ResendResetOtpUseCase } from "../application/use-cases/resend-reset-otp.use-case";
+import { ResendInvitationUseCase } from "../application/use-cases/resend-invitation.use-case";
 
 export const userRepository = new UserRepositoryImpl();
 
@@ -38,6 +39,14 @@ const passwordHasher = new BcryptPasswordHasher();
 const tokenService = new JwtTokenService();
 
 export const inviteUserUseCase = new InviteUserUseCase(
+  userRepository,
+  userTokenRepository,
+  randomTokenGenerator,
+  tokenHasher,
+  emailService,
+);
+
+export const resendInvitationUseCase = new ResendInvitationUseCase(
   userRepository,
   userTokenRepository,
   randomTokenGenerator,

@@ -4,13 +4,10 @@ import { GetParentsUseCase } from "../application/use-cases/get-parents.use-case
 
 import { AdminRepositoryImpl } from "../infrastructure/database/repositories/admin.repository.impl";
 import { AddParentUseCase } from "../application/use-cases/add-parent.use-case";
-import { 
-  inviteUserUseCase, 
+import {
+  inviteUserUseCase,
+  resendInvitationUseCase,
   userRepository,
-  userTokenRepository,
-  randomTokenGenerator,
-  tokenHasher,
-  emailService, 
 } from "../../auth/composition/auth.container";
 import { GetTeachersUseCase } from "../application/use-cases/get-teachers.use-case";
 import { AddTeacherUseCase } from "../application/use-cases/add-teacher.use-case";
@@ -18,7 +15,10 @@ import { TeacherRepositoryImpl } from "../infrastructure/database/repositories/t
 import { GetTeacherUseCase } from "../application/use-cases/get-teacher.use-case";
 import { UpdateTeacherUseCase } from "../application/use-cases/update-teacher.use-case";
 import { UpdateTeacherStatusUseCase } from "../application/use-cases/update-teacher-status.use-case";
-import { ResendTeacherInvitationUseCase } from "../application/use-cases/resend-teacher-invitation.use-case";
+// import { ResendTeacherInvitationUseCase } from "../application/use-cases/resend-teacher-invitation.use-case";
+import { GetParentUseCase } from "../application/use-cases/get-parent.use-case";
+import { UpdateParentUseCase } from "../application/use-cases/update-parent.use-case";
+import { UpdateParentStatusUseCase } from "../application/use-cases/update-parent-status.use-case";
 
 const adminRepository = new AdminRepositoryImpl();
 
@@ -27,6 +27,12 @@ const teacherRepository = new TeacherRepositoryImpl();
 const getParentsUseCase = new GetParentsUseCase(adminRepository);
 
 const addParentUseCase = new AddParentUseCase(inviteUserUseCase);
+
+const getParentUseCase = new GetParentUseCase(adminRepository);
+
+const updateParentUseCase = new UpdateParentUseCase(userRepository);
+
+const updateParentStatusUseCase = new UpdateParentStatusUseCase(userRepository);
 
 const getTeachersUseCase = new GetTeachersUseCase(adminRepository);
 
@@ -38,21 +44,26 @@ const updateTeacherUseCase = new UpdateTeacherUseCase(userRepository, teacherRep
 
 const updateTeacherStatusUseCase = new UpdateTeacherStatusUseCase(userRepository);
 
-const resendTeacherInvitationUseCase = new ResendTeacherInvitationUseCase(
-  userRepository,
-  userTokenRepository,
-  randomTokenGenerator,
-  tokenHasher,
-  emailService,
-);
+// const resendTeacherInvitationUseCase = new ResendTeacherInvitationUseCase(
+//   userRepository,
+//   userTokenRepository,
+//   randomTokenGenerator,
+//   tokenHasher,
+//   emailService,
+// );
+
+
 
 export const adminController = new AdminController(
   getParentsUseCase,
   addParentUseCase,
+  getParentUseCase,
+  updateParentUseCase,
+  updateParentStatusUseCase,
   getTeachersUseCase,
   addTeacherUseCase,
   getTeacherUseCase,
   updateTeacherUseCase,
   updateTeacherStatusUseCase,
-  resendTeacherInvitationUseCase
+  resendInvitationUseCase,
 );

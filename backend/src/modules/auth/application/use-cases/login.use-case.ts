@@ -14,6 +14,7 @@ import { env } from "../../../../config/env";
 import { TokenType } from "../../domain/enums/token-type.enum";
 import { UserToken } from "../../domain/entities/user-token.entity";
 import { ILoginUseCase } from "../use-case-interfaces/login.use-case.interface";
+import { UserBlockedError } from "../errors/user-blocked.error";
 
 export class LoginUseCase implements ILoginUseCase {
   constructor(
@@ -27,12 +28,15 @@ export class LoginUseCase implements ILoginUseCase {
 
     private readonly _tokenService: ITokenService,
   ) {}
-async execute(request: LoginRequest): Promise<LoginResponse> {
-  
+  async execute(request: LoginRequest): Promise<LoginResponse> {
     const user = await this._userRepository.findByEmail(request.email);
 
     if (!user) {
       throw new InvalidCredentialsError();
+    }
+
+    if (user.status === UserStatus.BLOCKED) {
+      throw new UserBlockedError();
     }
 
     if (user.status !== UserStatus.ACTIVE) {
