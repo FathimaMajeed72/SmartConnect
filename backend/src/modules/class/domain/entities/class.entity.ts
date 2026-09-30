@@ -4,6 +4,7 @@ export interface ClassEntity {
   id: string;
   name: string;
   code: string;
+  academicYear: string;
   description?: string;
   status: ClassStatus;
   createdAt: Date;

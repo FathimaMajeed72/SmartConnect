@@ -19,6 +19,7 @@ export class CreateClassUseCase implements ICreateClassUseCase {
       id: "",
       name: request.name,
       code: request.code,
+      academicYear: request.academicYear,
       description: request.description,
       status: ClassStatus.ACTIVE,
       createdAt: new Date(),

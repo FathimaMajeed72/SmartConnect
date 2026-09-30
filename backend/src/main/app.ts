@@ -11,16 +11,19 @@ import { AuthErrorStatusMapper } from "../modules/auth/presentation/mappers/auth
 import { AdminErrorStatusMapper } from "../modules/admin/presentation/mappers/admin-error-status.mapper";
 import { CompositeErrorStatusMapper } from "../shared/presentation/mappers/composite-error-status.mapper";
 import { CommonErrorStatusMapper } from "../shared/presentation/mappers/common-error-status.mapper";
+import { ClassErrorStatusMapper } from "../modules/class/presentation/mappers/class-error-status.mapper";
 
 const app = express();
 
 const authErrorStatusMapper = new AuthErrorStatusMapper();
 const adminErrorStatusMapper = new AdminErrorStatusMapper();
+const classErrorStatusMapper = new ClassErrorStatusMapper();
 const commonErrorStatusMapper = new CommonErrorStatusMapper();
 
 const errorStatusMapper = new CompositeErrorStatusMapper([
   authErrorStatusMapper,
   adminErrorStatusMapper,
+  classErrorStatusMapper,
   commonErrorStatusMapper,
 ]);
 

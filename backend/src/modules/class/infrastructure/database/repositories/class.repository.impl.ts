@@ -19,6 +19,7 @@ export class ClassRepositoryImpl
       id: document._id.toString(),
       name: document.name,
       code: document.code,
+      academicYear: document.academicYear,
       description: document.description,
       status: document.status,
       createdAt: document.createdAt,
@@ -32,6 +33,7 @@ export class ClassRepositoryImpl
     return {
       name: entity.name,
       code: entity.code,
+      academicYear: entity.academicYear,
       description: entity.description,
       status: entity.status,
     };
