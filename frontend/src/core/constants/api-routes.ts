@@ -15,5 +15,6 @@ export const API_ROUTES = {
     PARENTS: "/admin/parents",
     TEACHERS: "/admin/teachers",
     CLASSES: "/admin/classes",
+    SUBJECTS: "/admin/subjects",
   },
 } as const;

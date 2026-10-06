@@ -5,16 +5,12 @@ import { IErrorStatusMapper } from "../../../../shared/presentation/interfaces/e
 import { ClassErrorCode } from "../../application/enums/class-error-code.enum";
 
 export class ClassErrorStatusMapper implements IErrorStatusMapper {
-  private readonly _errorStatusMap: Record<
-    ClassErrorCode,
-    HttpStatusCode
-  > = {
+  private readonly _errorStatusMap: Record<ClassErrorCode, HttpStatusCode> = {
     [ClassErrorCode.CLASS_NOT_FOUND]: HttpStatusCode.NOT_FOUND,
+    [ClassErrorCode.CLASS_CODE_ALREADY_EXISTS]: HttpStatusCode.CONFLICT,
   };
 
-  getStatusCode(
-    errorCode: string,
-  ): HttpStatusCode | undefined {
+  getStatusCode(errorCode: string): HttpStatusCode | undefined {
     return this._errorStatusMap[errorCode as ClassErrorCode];
   }
 }

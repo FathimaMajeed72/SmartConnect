@@ -1,26 +1,29 @@
 import { HydratedDocument } from "mongoose";
 
-import { ClassEntity } from "../../../domain/entities/class.entity";
-import { ClassStatus } from "../../../domain/enums/class-status.enum";
-import { IClassRepository } from "../../../domain/repositories/class.repository";
-import { ClassModel, IClassDocument } from "../models/class.model";
-import { BaseRepositoryImpl } from "../../../../../shared/infrastructure/database/base.repository.impl";
+import { SubjectEntity } from "../../../domain/entities/subject.entity";
+import { SubjectStatus } from "../../../domain/enums/subject-status.enum";
+import { ISubjectRepository } from "../../../domain/repositories/subject.repository";
+import {
+  ISubjectDocument,
+  SubjectModel,
+} from "../models/subject.model";
 
-export class ClassRepositoryImpl
-  extends BaseRepositoryImpl<ClassEntity, IClassDocument>
-  implements IClassRepository
+import { BaseRepositoryImpl } from "../../../../../shared/infrastructure/database/base.repository.impl";
+import { SubjectNotFoundError } from "../../../application/errors/subject-not-found.error";
+
+export class SubjectRepositoryImpl
+  extends BaseRepositoryImpl<SubjectEntity, ISubjectDocument>
+  implements ISubjectRepository
 {
-  protected readonly _model = ClassModel;
+  protected readonly _model = SubjectModel;
 
   protected toDomain(
-    document: HydratedDocument<IClassDocument>,
-  ): ClassEntity {
+    document: HydratedDocument<ISubjectDocument>,
+  ): SubjectEntity {
     return {
       id: document._id.toString(),
       name: document.name,
       code: document.code,
-      academicYear: document.academicYear,
-      description: document.description,
       status: document.status,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
@@ -28,13 +31,11 @@ export class ClassRepositoryImpl
   }
 
   protected toDocument(
-    entity: ClassEntity,
-  ): Partial<IClassDocument> {
+    entity: SubjectEntity,
+  ): Partial<ISubjectDocument> {
     return {
       name: entity.name,
       code: entity.code,
-      academicYear: entity.academicYear,
-      description: entity.description,
       status: entity.status,
     };
   }
@@ -43,9 +44,9 @@ export class ClassRepositoryImpl
     page: number,
     limit: number,
     search?: string,
-    status?: ClassStatus,
+    status?: SubjectStatus,
   ): Promise<{
-    classes: ClassEntity[];
+    subjects: SubjectEntity[];
     total: number;
   }> {
     const filter: Record<string, unknown> = {};
@@ -84,33 +85,15 @@ export class ClassRepositoryImpl
     ]);
 
     return {
-      classes: documents.map((document) => this.toDomain(document)),
+      subjects: documents.map((document) => this.toDomain(document)),
       total,
     };
   }
 
-
-  async findByCodeOrNameAndAcademicYear(
-    code: string,
-    name: string,
-    academicYear: string,
-  ): Promise<ClassEntity | null> {
-    const document = await this._model.findOne({
-      academicYear,
-      $or: [
-        { code },
-        { name },
-      ],
-    });
-
-    return document ? this.toDomain(document) : null;
-  }
-
-
   async updateStatus(
     id: string,
-    status: ClassStatus,
-  ): Promise<ClassEntity> {
+    status: SubjectStatus,
+  ): Promise<SubjectEntity> {
     const document = await this._model.findByIdAndUpdate(
       id,
       { status },
@@ -121,9 +104,17 @@ export class ClassRepositoryImpl
     );
 
     if (!document) {
-      throw new Error("Class not found.");
+      throw new SubjectNotFoundError();
     }
 
     return this.toDomain(document);
+  }
+
+  async findByCode(code: string): Promise<SubjectEntity | null> {
+    const document = await this._model.findOne({
+      code: code.toUpperCase(),
+    });
+
+    return document ? this.toDomain(document) : null;
   }
 }

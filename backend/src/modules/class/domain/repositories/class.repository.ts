@@ -13,5 +13,11 @@ export interface IClassRepository extends IBaseRepository<ClassEntity> {
     total: number;
   }>;
 
+  findByCodeOrNameAndAcademicYear(
+    code: string,
+    name: string,
+    academicYear: string,
+  ): Promise<ClassEntity | null>;
+
   updateStatus(id: string, status: ClassStatus): Promise<ClassEntity>;
 }

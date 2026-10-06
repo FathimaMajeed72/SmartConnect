@@ -4,9 +4,6 @@ export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data;
 
-    if (data?.message) {
-      return data.message;
-    }
 
     if (data?.errors) {
       const firstError = Object.values(data.errors)[0];
@@ -14,6 +11,10 @@ export function getErrorMessage(error: unknown): string {
       if (Array.isArray(firstError)) {
         return firstError[0];
       }
+    }
+
+    if (data?.message) {
+      return data.message;
     }
 
     return "Something went wrong.";

@@ -3,13 +3,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { createClass } from "../services/class.service";
-import type { CreateClassRequest } from "../types/class.types";
+import { createSubject } from "../services/subject.service";
+import type {
+  CreateSubjectRequest,
+} from "../types/subject.types";
 
 import {
-  classSchema,
-  type ClassFormData,
-} from "../schemas/class.schema";
+  subjectSchema,
+  type SubjectFormData,
+} from "../schemas/subject.schema";
 
 import {
   Dialog,
@@ -21,23 +23,21 @@ import {
 } from "@/shared/ui/dialog";
 
 import { Input } from "@/shared/ui/input";
-import { Textarea } from "@/shared/ui/textarea";
 import { Button } from "@/shared/ui/button";
+
 import { getErrorMessage } from "@/core/utils/getErrorMessage";
 
-
-
-interface AddClassDialogProps {
+interface AddSubjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onClassCreated: () => Promise<void>;
+  onSubjectCreated: () => Promise<void>;
 }
 
-export default function AddClassDialog({
+export default function AddSubjectDialog({
   open,
   onOpenChange,
-  onClassCreated,
-}: AddClassDialogProps) {
+  onSubjectCreated,
+}: AddSubjectDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -45,39 +45,38 @@ export default function AddClassDialog({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ClassFormData>({
-    resolver: zodResolver(classSchema),
+  } = useForm<SubjectFormData>({
+    resolver: zodResolver(subjectSchema),
     defaultValues: {
       name: "",
       code: "",
-      academicYear: "",
-      description: "",
     },
   });
 
   const onSubmit = async (
-    data: ClassFormData,
+    data: SubjectFormData,
   ) => {
     try {
       setIsSubmitting(true);
 
-      const request: CreateClassRequest = {
+      const request: CreateSubjectRequest = {
         name: data.name,
         code: data.code,
-        academicYear: data.academicYear,
-        description: data.description || undefined,
       };
 
-      await createClass(request);
+      await createSubject(request);
 
-      toast.success("Class created successfully.");
+      toast.success("Subject created successfully.");
 
       reset();
       onOpenChange(false);
 
-      await onClassCreated();
+      await onSubjectCreated();
     } catch (error) {
-      console.error("Failed to create class:", error);
+      console.error(
+        "Failed to create subject:",
+        error,
+      );
 
       toast.error(getErrorMessage(error));
     } finally {
@@ -101,11 +100,11 @@ export default function AddClassDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Add Class
+            Add Subject
           </DialogTitle>
 
           <DialogDescription>
-            Create a new class by providing its
+            Create a new subject by providing its
             basic information.
           </DialogDescription>
         </DialogHeader>
@@ -114,18 +113,18 @@ export default function AddClassDialog({
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4"
         >
-          {/* Class Name */}
+          {/* Subject Name */}
           <div className="space-y-2">
             <label
-              htmlFor="class-name"
+              htmlFor="subject-name"
               className="text-sm font-medium"
             >
-              Class Name
+              Subject Name
             </label>
 
             <Input
-              id="class-name"
-              placeholder="e.g. Class 10"
+              id="subject-name"
+              placeholder="e.g. Mathematics"
               {...register("name")}
             />
 
@@ -136,68 +135,24 @@ export default function AddClassDialog({
             )}
           </div>
 
-          {/* Class Code */}
+          {/* Subject Code */}
           <div className="space-y-2">
             <label
-              htmlFor="class-code"
+              htmlFor="subject-code"
               className="text-sm font-medium"
             >
-              Class Code
+              Subject Code
             </label>
 
             <Input
-              id="class-code"
-              placeholder="e.g. CLS10"
+              id="subject-code"
+              placeholder="e.g. MATH"
               {...register("code")}
             />
 
             {errors.code && (
               <p className="text-sm text-destructive">
                 {errors.code.message}
-              </p>
-            )}
-          </div>
-
-          {/* Academic Year */}
-          <div className="space-y-2">
-            <label
-              htmlFor="academic-year"
-              className="text-sm font-medium"
-            >
-              Academic Year
-            </label>
-
-            <Input
-              id="academic-year"
-              placeholder="e.g. 2026-2027"
-              {...register("academicYear")}
-            />
-
-            {errors.academicYear && (
-              <p className="text-sm text-destructive">
-                {errors.academicYear.message}
-              </p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <label
-              htmlFor="class-description"
-              className="text-sm font-medium"
-            >
-              Description
-            </label>
-
-            <Textarea
-              id="class-description"
-              placeholder="Enter class description"
-              {...register("description")}
-            />
-
-            {errors.description && (
-              <p className="text-sm text-destructive">
-                {errors.description.message}
               </p>
             )}
           </div>
@@ -220,7 +175,7 @@ export default function AddClassDialog({
             >
               {isSubmitting
                 ? "Creating..."
-                : "Create Class"}
+                : "Create Subject"}
             </Button>
           </DialogFooter>
         </form>
