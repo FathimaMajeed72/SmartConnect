@@ -20,8 +20,11 @@ export function useSubjects() {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   const fetchSubjects = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
 
     try {
       const response = await getSubjects({
@@ -37,6 +40,7 @@ export function useSubjects() {
     } catch (error) {
       console.error("Failed to fetch subjects:", error);
 
+      setError("Failed to load subjects.");
       setSubjects([]);
       setTotal(0);
       setTotalPages(0);
@@ -75,6 +79,7 @@ export function useSubjects() {
     total,
     totalPages,
     isLoading,
+    error,
     fetchSubjects,
   };
 }

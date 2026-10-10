@@ -7,9 +7,7 @@ import type {
   TeacherListItem,
 } from "../types/teacher.types";
 
-import {
-  type UserStatus,
-} from "@/features/admin/types/user-status";
+import { type UserStatus } from "@/features/admin/types/user-status";
 
 interface UseTeachersReturn {
   teachers: TeacherListItem[];
@@ -24,6 +22,7 @@ interface UseTeachersReturn {
   setSearch: (search: string) => void;
   setStatusFilter: (status: UserStatus | "ALL") => void;
   fetchTeachers: () => Promise<void>;
+  error: string | null;
 }
 
 export function useTeachers(): UseTeachersReturn {
@@ -31,8 +30,7 @@ export function useTeachers(): UseTeachersReturn {
   const [isLoading, setIsLoading] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState<UserStatus | "ALL">("ALL");
+  const [statusFilter, setStatusFilter] = useState<UserStatus | "ALL">("ALL");
 
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -40,9 +38,12 @@ export function useTeachers(): UseTeachersReturn {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  const [error, setError] = useState<string | null>(null);
+
   const fetchTeachers = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
 
       const params: GetTeachersParams = {
         page,
@@ -65,6 +66,11 @@ export function useTeachers(): UseTeachersReturn {
       setTotalPages(result.totalPages);
     } catch (error) {
       console.error("Failed to fetch teachers:", error);
+
+      setError("Failed to load teachers.");
+      setTeachers([]);
+      setTotal(0);
+      setTotalPages(0);
     } finally {
       setIsLoading(false);
     }
@@ -91,5 +97,6 @@ export function useTeachers(): UseTeachersReturn {
     setSearch,
     setStatusFilter,
     fetchTeachers,
+    error,
   };
 }

@@ -15,6 +15,7 @@ import { updateClassSchema } from "../validators/update-class.validator";
 import { updateClassStatusSchema } from "../validators/update-class-status.validator";
 
 import { CLASS_ROUTES } from "./class.routes.constants";
+import { assignClassSubjectSchema } from "../validators/assign-class-subject.validator";
 
 const router = Router();
 
@@ -55,6 +56,21 @@ router.patch(
   authorize(Role.ADMIN),
   validate(updateClassStatusSchema),
   classController.updateClassStatus.bind(classController),
+);
+
+router.get(
+  `${CLASS_ROUTES.ROOT}:classId/subjects`,
+  authenticate,
+  authorize(Role.ADMIN),
+  classController.getClassSubjects.bind(classController),
+);
+
+router.post(
+  `${CLASS_ROUTES.ROOT}:classId/subjects`,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(assignClassSubjectSchema),
+  classController.assignClassSubject.bind(classController),
 );
 
 export default router;

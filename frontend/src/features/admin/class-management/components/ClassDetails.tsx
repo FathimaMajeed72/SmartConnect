@@ -1,15 +1,17 @@
-import { BookOpen, Users, UserRound, Layers, Pencil } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, Users, UserRound, Layers, Pencil, Plus } from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 
 import type { ClassListItem } from "@/features/admin/class-management/types/class.types";
 import { Button } from "@/shared/ui/button";
 
+import { useClassSubjects } from "../hooks/use-class-subjects";
+import { AssignSubjectDialog } from "./AssignSubjectDialog";
+
 interface ClassDetailsProps {
   classDetails: ClassListItem | null;
   activeTab: "overview" | "subjects" | "batches";
-  onTabChange: (
-    tab: "overview" | "subjects" | "batches",
-  ) => void;
+  onTabChange: (tab: "overview" | "subjects" | "batches") => void;
   onEditClass: () => void;
   onStatusChange: () => void;
   isLoading: boolean;
@@ -23,6 +25,17 @@ export default function ClassDetails({
   onStatusChange,
   isLoading,
 }: ClassDetailsProps) {
+  const {
+    data: classSubjectsData,
+    isLoading: isClassSubjectsLoading,
+    isError: isClassSubjectsError,
+    refetch: refetchClassSubjects,
+  } = useClassSubjects(classDetails?.id ?? "");
+
+  const classSubjects = classSubjectsData?.classSubjects ?? [];
+
+  const [isAssignSubjectOpen, setIsAssignSubjectOpen] = useState(false);
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center rounded-lg bg-white">
@@ -49,9 +62,7 @@ export default function ClassDetails({
       <div className="border-b p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold">
-              {classDetails.name}
-            </h1>
+            <h1 className="text-xl font-semibold">{classDetails.name}</h1>
 
             <p className="mt-1 text-sm text-muted-foreground">
               {classDetails.code}
@@ -64,7 +75,7 @@ export default function ClassDetails({
             size="sm"
             onClick={onEditClass}
           >
-          <Pencil className="mr-2 h-4 w-4" />
+            <Pencil className="mr-2 h-4 w-4" />
             Edit Class
           </Button>
 
@@ -74,9 +85,7 @@ export default function ClassDetails({
             size="sm"
             onClick={onStatusChange}
           >
-            {classDetails.status === "ACTIVE"
-              ? "Deactivate"
-              : "Activate"}
+            {classDetails.status === "ACTIVE" ? "Deactivate" : "Activate"}
           </Button>
         </div>
       </div>
@@ -125,16 +134,75 @@ export default function ClassDetails({
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {activeTab === "overview" && (
-          <ClassOverview
-            classDetails={classDetails}
-          />
+          <ClassOverview classDetails={classDetails} />
         )}
 
         {activeTab === "subjects" && (
-          <div className="flex min-h-75 items-center justify-center">
-            <p className="text-sm text-muted-foreground">
-              Subjects will be displayed here.
-            </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Subjects</h2>
+
+                <p className="text-sm text-muted-foreground">
+                  Manage subjects and their assigned teachers.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => setIsAssignSubjectOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Assign Subject
+              </Button>
+            </div>
+
+            {isClassSubjectsLoading ? (
+              <div className="flex min-h-75 items-center justify-center">
+                <p className="text-sm text-muted-foreground">
+                  Loading assigned subjects...
+                </p>
+              </div>
+            ) : isClassSubjectsError ? (
+              <div className="flex min-h-75 flex-col items-center justify-center gap-3">
+                <p className="text-sm text-destructive">
+                  Failed to load assigned subjects.
+                </p>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void refetchClassSubjects()}
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : classSubjects.length === 0 ? (
+              <div className="flex min-h-75 items-center justify-center">
+                <p className="text-sm text-muted-foreground">
+                  No subjects assigned to this class.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg border">
+                {classSubjects.map((classSubject) => (
+                  <div
+                    key={classSubject.id}
+                    className="flex items-center justify-between border-b p-4 last:border-b-0"
+                  >
+                    <div>
+                      <p className="font-medium">{classSubject.subjectName}</p>
+
+                      <p className="text-sm text-muted-foreground">
+                        {classSubject.subjectCode}
+                      </p>
+                    </div>
+
+                    <div className="text-sm">{classSubject.teacherName}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -146,17 +214,22 @@ export default function ClassDetails({
           </div>
         )}
       </div>
+
+      <AssignSubjectDialog
+        classId={classDetails.id}
+        open={isAssignSubjectOpen}
+        onOpenChange={setIsAssignSubjectOpen}
+        assignedSubjects={classSubjects}
+      />
     </div>
   );
 }
 
 interface ClassOverviewProps {
-  classDetails: ClassListItem ;
+  classDetails: ClassListItem;
 }
 
-function ClassOverview({
-  classDetails,
-}: ClassOverviewProps) {
+function ClassOverview({ classDetails }: ClassOverviewProps) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -188,31 +261,18 @@ function ClassOverview({
 
       {/* Class Information */}
       <div className="rounded-lg border p-5">
-        <h2 className="mb-4 font-semibold">
-          Class Information
-        </h2>
+        <h2 className="mb-4 font-semibold">Class Information</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <InfoRow
-            label="Class Name"
-            value={classDetails.name}
-          />
+          <InfoRow label="Class Name" value={classDetails.name} />
 
-          <InfoRow
-            label="Class Code"
-            value={classDetails.code}
-          />
+          <InfoRow label="Class Code" value={classDetails.code} />
 
-          <InfoRow
-            label="Academic Year"
-            value={classDetails.academicYear}
-          />
+          <InfoRow label="Academic Year" value={classDetails.academicYear} />
 
           <InfoRow
             label="Description"
-            value={
-              classDetails.description || "—"
-            }
+            value={classDetails.description || "—"}
           />
 
           {/* <InfoRow
@@ -221,9 +281,7 @@ function ClassOverview({
           /> */}
 
           <div>
-            <p className="text-xs text-muted-foreground">
-              Status
-            </p>
+            <p className="text-xs text-muted-foreground">Status</p>
 
             <div className="mt-1">
               <ClassStatusBadge status={classDetails.status} />
@@ -232,9 +290,7 @@ function ClassOverview({
 
           <InfoRow
             label="Created On"
-            value={new Date(
-              classDetails.createdAt,
-            ).toLocaleDateString()}
+            value={new Date(classDetails.createdAt).toLocaleDateString()}
           />
         </div>
       </div>
@@ -246,22 +302,12 @@ interface ClassStatusBadgeProps {
   status: ClassListItem["status"];
 }
 
-function ClassStatusBadge({
-  status,
-}: ClassStatusBadgeProps) {
+function ClassStatusBadge({ status }: ClassStatusBadgeProps) {
   if (status === "ACTIVE") {
-    return (
-      <Badge variant="default">
-        Active
-      </Badge>
-    );
+    return <Badge variant="default">Active</Badge>;
   }
 
-  return (
-    <Badge variant="secondary">
-      Inactive
-    </Badge>
-  );
+  return <Badge variant="secondary">Inactive</Badge>;
 }
 
 interface SummaryCardProps {
@@ -270,11 +316,7 @@ interface SummaryCardProps {
   value: string | number;
 }
 
-function SummaryCard({
-  icon,
-  label,
-  value,
-}: SummaryCardProps) {
+function SummaryCard({ icon, label, value }: SummaryCardProps) {
   return (
     <div className="rounded-lg border p-4">
       <div className="mb-2 flex items-center gap-2 text-muted-foreground">
@@ -282,9 +324,7 @@ function SummaryCard({
         <span className="text-xs">{label}</span>
       </div>
 
-      <p className="text-xl font-semibold">
-        {value}
-      </p>
+      <p className="text-xl font-semibold">{value}</p>
     </div>
   );
 }
@@ -294,19 +334,12 @@ interface InfoRowProps {
   value: string;
 }
 
-function InfoRow({
-  label,
-  value,
-}: InfoRowProps) {
+function InfoRow({ label, value }: InfoRowProps) {
   return (
     <div>
-      <p className="text-xs text-muted-foreground">
-        {label}
-      </p>
+      <p className="text-xs text-muted-foreground">{label}</p>
 
-      <p className="mt-1 text-sm font-medium">
-        {value}
-      </p>
+      <p className="mt-1 text-sm font-medium">{value}</p>
     </div>
   );
 }
