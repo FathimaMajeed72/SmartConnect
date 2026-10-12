@@ -98,7 +98,7 @@ export class SubjectRepositoryImpl
       id,
       { status },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );

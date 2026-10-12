@@ -58,7 +58,7 @@ export class UserRepositoryImpl
       id,
       { status },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );

@@ -50,7 +50,7 @@ export abstract class BaseRepositoryImpl<
       entity.id,
       this.toDocument(entity),
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );
