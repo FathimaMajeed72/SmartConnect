@@ -4,6 +4,11 @@ import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
+  // Ignore generated files and dependencies
+  {
+    ignores: ["dist/", "node_modules/"],
+  },
+  
   js.configs.recommended,
 
   ...tseslint.configs.recommended,

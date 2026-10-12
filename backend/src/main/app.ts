@@ -6,6 +6,9 @@ import cookieParser from "cookie-parser";
 import routes from "./routes";
 
 import { errorMiddleware } from "../shared/presentation/middlewares/error.middleware";
+
+import { requestLogger } from "../shared/presentation/middlewares/request-logger.middleware";
+
 import { env } from "../config/env";
 import { AuthErrorStatusMapper } from "../modules/auth/presentation/mappers/auth-error-status.mapper";
 import { AdminErrorStatusMapper } from "../modules/admin/presentation/mappers/admin-error-status.mapper";
@@ -46,6 +49,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(compression());
+
+app.use(requestLogger);
 
 app.use("/api", routes);
 
