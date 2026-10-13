@@ -187,7 +187,7 @@ export class ClassSubjectRepositoryImpl
       id,
       { status },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );
