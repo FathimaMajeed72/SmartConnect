@@ -16,5 +16,6 @@ export const API_ROUTES = {
     TEACHERS: "/admin/teachers",
     CLASSES: "/admin/classes",
     SUBJECTS: "/admin/subjects",
+    ACADEMIC_YEARS: "/admin/classes/academic-years",
   },
 } as const;

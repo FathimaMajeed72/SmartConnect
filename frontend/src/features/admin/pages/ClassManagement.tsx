@@ -3,43 +3,61 @@ import { useEffect, useState } from "react";
 import ClassList from "../class-management/components/ClassList";
 import ClassDetails from "../class-management/components/ClassDetails";
 
-import { useClasses } from "../class-management/hooks/use-classes"; 
+import { useClasses } from "../class-management/hooks/use-classes";
 import { useClassDetails } from "../class-management/hooks/use-class-details";
 
 import AddClassDialog from "../class-management/components/AddClassDialog";
 import EditClassDialog from "../class-management/components/EditClassDialog";
-import { CLASS_STATUS, type ClassStatus } from "../class-management/types/class-status";
+import {
+  CLASS_STATUS,
+  type ClassStatus,
+} from "../class-management/types/class-status";
 import { updateClassStatus } from "../class-management/services/class.service";
 import ConfirmDialog from "@/shared/components/ConfirmDialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+import { useAcademicYears } from "../class-management/hooks/use-academic-years";
 
 type ClassTab = "overview" | "subjects" | "batches";
 
 export default function ClassManagement() {
-  const [selectedClassId, setSelectedClassId] =
-    useState<string | null>(null);
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] =
-    useState<ClassTab>("overview");
+  const [activeTab, setActiveTab] = useState<ClassTab>("overview");
 
-  const [isAddClassOpen, setIsAddClassOpen] =
-    useState(false);
+  const [isAddClassOpen, setIsAddClassOpen] = useState(false);
 
-  const [isEditClassOpen, setIsEditClassOpen] =
-    useState(false);
+  const [isEditClassOpen, setIsEditClassOpen] = useState(false);
 
-  const [isStatusConfirmOpen, setIsStatusConfirmOpen] =
-  useState(false);
+  const [isStatusConfirmOpen, setIsStatusConfirmOpen] = useState(false);
 
-  const [isStatusUpdating, setIsStatusUpdating] =
-  useState(false);
-  
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+
+  const {
+    academicYears,
+    isLoading: isAcademicYearsLoading,
+    isError: isAcademicYearsError,
+  } = useAcademicYears();
+
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
+
+  const academicYear = academicYears.includes(selectedAcademicYear)
+  ? selectedAcademicYear
+  : (academicYears[0] ?? "");
+
   const {
     classes,
     isLoading: isClassesLoading,
     search,
     setSearch,
     fetchClasses,
-  } = useClasses();
+  } = useClasses(academicYear, setSelectedAcademicYear);
 
   const {
     classDetails,
@@ -47,8 +65,11 @@ export default function ClassManagement() {
     fetchClass,
   } = useClassDetails();
 
-  const effectiveSelectedClassId =
-  selectedClassId ?? classes[0]?.id ?? null;
+  const effectiveSelectedClassId = classes.some(
+    (item) => item.id === selectedClassId,
+  )
+    ? selectedClassId
+    : (classes[0]?.id ?? null);
 
   const handleSelectClass = (classId: string) => {
     setSelectedClassId(classId);
@@ -81,59 +102,100 @@ export default function ClassManagement() {
   //     }
   //   };
 
-    const handleStatusChange = () => {
-      setIsStatusConfirmOpen(true);
-    };
+  const handleStatusChange = () => {
+    setIsStatusConfirmOpen(true);
+  };
 
-    const handleConfirmStatusChange = async () => {
-      if (!classDetails) {
-        return;
-      }
+  const handleConfirmStatusChange = async () => {
+    if (!classDetails) {
+      return;
+    }
 
-      try {
-        setIsStatusUpdating(true);
+    try {
+      setIsStatusUpdating(true);
 
-        const newStatus: ClassStatus =
-          classDetails.status === CLASS_STATUS.ACTIVE
-            ? CLASS_STATUS.INACTIVE
-            : CLASS_STATUS.ACTIVE;
+      const newStatus: ClassStatus =
+        classDetails.status === CLASS_STATUS.ACTIVE
+          ? CLASS_STATUS.INACTIVE
+          : CLASS_STATUS.ACTIVE;
 
-        await updateClassStatus(
-          classDetails.id,
-          { status: newStatus },
-        );
+      await updateClassStatus(classDetails.id, { status: newStatus });
 
-        setIsStatusConfirmOpen(false);
+      setIsStatusConfirmOpen(false);
 
-        await fetchClasses();
-        await fetchClass(classDetails.id);
-      } catch (error) {
-        console.error(
-          "Failed to update class status:",
-          error,
-        );
-      } finally {
-        setIsStatusUpdating(false);
-      }
-    };
+      await fetchClasses();
+      await fetchClass(classDetails.id);
+    } catch (error) {
+      console.error("Failed to update class status:", error);
+    } finally {
+      setIsStatusUpdating(false);
+    }
+  };
 
-useEffect(() => {
-  if (effectiveSelectedClassId) {
-    void fetchClass(effectiveSelectedClassId);
-  }
-}, [effectiveSelectedClassId, fetchClass]);
+  useEffect(() => {
+    if (effectiveSelectedClassId) {
+      void fetchClass(effectiveSelectedClassId);
+    }
+  }, [effectiveSelectedClassId, fetchClass]);
+
+  // useEffect(() => {
+  //   if (academicYears.length === 0) {
+  //     return;
+  //   }
+
+  //   if (!academicYear || !academicYears.includes(academicYear)) {
+  //     setAcademicYear(academicYears[0]);
+  //   }
+  // }, [academicYears, academicYear]);
 
   return (
     <div className="h-full">
       {/* Page Header */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-semibold">
-          Classes
-        </h1>
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Classes</h1>
 
-        <p className="text-sm text-muted-foreground">
-          Manage classes, subjects, and batches.
-        </p>
+          <p className="text-sm text-muted-foreground">
+            Manage classes, subjects, and batches.
+          </p>
+        </div>
+
+        <div className="w-52 shrink-0">
+          <label
+            htmlFor="academic-year"
+            className="mb-2 block text-sm font-medium"
+          >
+            Academic Year
+          </label>
+
+          <Select value={academicYear} onValueChange={setSelectedAcademicYear} disabled={isAcademicYearsLoading || academicYears.length === 0} >
+            <SelectTrigger id="academic-year">
+              <SelectValue placeholder="Select academic year" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {isAcademicYearsLoading ? (
+                <SelectItem value="loading" disabled>
+                  Loading academic years...
+                </SelectItem>
+              ) : isAcademicYearsError ? (
+                <SelectItem value="error" disabled>
+                  Failed to load academic years
+                </SelectItem>
+              ) : academicYears.length === 0 ? (
+                <SelectItem value="empty" disabled>
+                  No academic years available
+                </SelectItem>
+              ) : (
+                academicYears.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -154,9 +216,7 @@ useEffect(() => {
           classDetails={classDetails}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          onEditClass={() =>
-            setIsEditClassOpen(true)
-          }
+          onEditClass={() => setIsEditClassOpen(true)}
           onStatusChange={handleStatusChange}
           isLoading={isClassDetailsLoading}
         />
@@ -182,7 +242,6 @@ useEffect(() => {
           }}
         />
       )}
-
 
       {classDetails && (
         <ConfirmDialog

@@ -3,25 +3,17 @@ import { z } from "zod";
 import { ClassStatus } from "../../domain/enums/class-status.enum";
 
 export const getClassesSchema = z.object({
-  page: z.coerce
-    .number()
-    .int()
-    .min(1)
-    .default(1),
+  page: z.coerce.number().int().min(1).default(1),
 
-  limit: z.coerce
-    .number()
-    .int()
-    .min(1)
-    .max(100)
-    .default(10),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
 
-  search: z
+  search: z.string().trim().optional(),
+
+  status: z.enum(ClassStatus).optional(),
+
+  academicYear: z
     .string()
     .trim()
-    .optional(),
-
-  status: z
-    .enum(ClassStatus)
+    .regex(/^\d{4}-\d{4}$/, "Academic year must be in YYYY-YYYY format.")
     .optional(),
 });

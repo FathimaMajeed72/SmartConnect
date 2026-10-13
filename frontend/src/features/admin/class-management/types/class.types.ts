@@ -24,6 +24,7 @@ export interface GetClassesParams {
   limit?: number;
   search?: string;
   status?: ClassStatus;
+  academicYear?: string;
 }
 
 export interface CreateClassRequest {

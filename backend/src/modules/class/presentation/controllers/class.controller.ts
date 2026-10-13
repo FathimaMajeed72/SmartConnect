@@ -15,6 +15,7 @@ import { IUpdateClassStatusUseCase } from "../../application/use-case-interfaces
 import { ClassStatus } from "../../domain/enums/class-status.enum";
 import { IGetClassSubjectsUseCase } from "../../application/use-case-interfaces/get-class-subjects.use-case.interface";
 import { IAssignClassSubjectUseCase } from "../../application/use-case-interfaces/assign-class-subject.use-case.interface";
+import { IGetAcademicYearsUseCase } from "../../application/use-case-interfaces/get-academic-years.use-case.interface";
 
 export class ClassController {
   constructor(
@@ -25,6 +26,7 @@ export class ClassController {
     private readonly _updateClassStatusUseCase: IUpdateClassStatusUseCase,
     private readonly _getClassSubjectsUseCase: IGetClassSubjectsUseCase,
     private readonly _assignClassSubjectUseCase: IAssignClassSubjectUseCase,
+    private readonly _getAcademicYearsUseCase: IGetAcademicYearsUseCase,
   ) {}
 
   async createClass(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -39,11 +41,12 @@ export class ClassController {
 
   async getClasses(req: ValidatedQueryRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { page, limit, search, status } = req.validatedQuery as {
+      const { page, limit, search, status, academicYear } = req.validatedQuery as {
         page: number;
         limit: number;
         search?: string;
         status?: ClassStatus;
+        academicYear?: string;
       };
 
       const result = await this._getClassesUseCase.execute({
@@ -51,6 +54,7 @@ export class ClassController {
         limit,
         search,
         status,
+        academicYear,
       });
 
       sendSuccess(res, HttpStatusCode.OK, "Classes retrieved successfully.", result);
@@ -157,6 +161,16 @@ export class ClassController {
       const result = await this._assignClassSubjectUseCase.execute(classId, req.body);
 
       sendSuccess(res, HttpStatusCode.CREATED, "Subject assigned to class successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAcademicYears(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._getAcademicYearsUseCase.execute();
+
+      sendSuccess(res, HttpStatusCode.OK, "Academic years retrieved successfully.", result);
     } catch (error) {
       next(error);
     }

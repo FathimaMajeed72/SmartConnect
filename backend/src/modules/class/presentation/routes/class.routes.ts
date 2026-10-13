@@ -20,6 +20,13 @@ import { assignClassSubjectSchema } from "../validators/assign-class-subject.val
 const router = Router();
 
 router.get(
+  CLASS_ROUTES.ACADEMIC_YEARS,
+  authenticate,
+  authorize(Role.ADMIN),
+  classController.getAcademicYears.bind(classController),
+);
+
+router.get(
   CLASS_ROUTES.ROOT,
   authenticate,
   authorize(Role.ADMIN),

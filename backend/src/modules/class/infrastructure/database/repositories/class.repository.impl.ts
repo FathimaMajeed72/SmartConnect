@@ -12,9 +12,7 @@ export class ClassRepositoryImpl
 {
   protected readonly _model = ClassModel;
 
-  protected toDomain(
-    document: HydratedDocument<IClassDocument>,
-  ): ClassEntity {
+  protected toDomain(document: HydratedDocument<IClassDocument>): ClassEntity {
     return {
       id: document._id.toString(),
       name: document.name,
@@ -27,9 +25,7 @@ export class ClassRepositoryImpl
     };
   }
 
-  protected toDocument(
-    entity: ClassEntity,
-  ): Partial<IClassDocument> {
+  protected toDocument(entity: ClassEntity): Partial<IClassDocument> {
     return {
       name: entity.name,
       code: entity.code,
@@ -44,11 +40,16 @@ export class ClassRepositoryImpl
     limit: number,
     search?: string,
     status?: ClassStatus,
+    academicYear?: string,
   ): Promise<{
     classes: ClassEntity[];
     total: number;
   }> {
     const filter: Record<string, unknown> = {};
+
+    if (academicYear) {
+      filter.academicYear = academicYear;
+    }
 
     if (search) {
       filter.$or = [
@@ -74,11 +75,7 @@ export class ClassRepositoryImpl
     const skip = (page - 1) * limit;
 
     const [documents, total] = await Promise.all([
-      this._model
-        .find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
+      this._model.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
 
       this._model.countDocuments(filter),
     ]);
@@ -89,7 +86,6 @@ export class ClassRepositoryImpl
     };
   }
 
-
   async findByCodeOrNameAndAcademicYear(
     code: string,
     name: string,
@@ -97,25 +93,18 @@ export class ClassRepositoryImpl
   ): Promise<ClassEntity | null> {
     const document = await this._model.findOne({
       academicYear,
-      $or: [
-        { code },
-        { name },
-      ],
+      $or: [{ code }, { name }],
     });
 
     return document ? this.toDomain(document) : null;
   }
 
-
-  async updateStatus(
-    id: string,
-    status: ClassStatus,
-  ): Promise<ClassEntity> {
+  async updateStatus(id: string, status: ClassStatus): Promise<ClassEntity> {
     const document = await this._model.findByIdAndUpdate(
       id,
       { status },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );
@@ -125,5 +114,11 @@ export class ClassRepositoryImpl
     }
 
     return this.toDomain(document);
+  }
+
+  async getAcademicYears(): Promise<string[]> {
+    const academicYears: string[] = await this._model.distinct("academicYear");
+
+    return academicYears.sort((a, b) => b.localeCompare(a));
   }
 }

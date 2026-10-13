@@ -13,6 +13,7 @@ import { AssignClassSubjectUseCase } from "../application/use-cases/assign-class
 import { SubjectRepositoryImpl } from "../../subject/infrastructure/database/repositories/subject.repository.impl";
 import { TeacherRepositoryImpl } from "../../admin/infrastructure/database/repositories/teacher.repository.impl";
 import { UserRepositoryImpl } from "../../auth/infrastructure/database/repositories/user.repository.impl";
+import { GetAcademicYearsUseCase } from "../application/use-cases/get-academic-years.use-case";
 
 const classRepository = new ClassRepositoryImpl();
 
@@ -44,8 +45,10 @@ const assignClassSubjectUseCase = new AssignClassSubjectUseCase(
   subjectRepository,
   teacherRepository,
   classSubjectRepository,
-  userRepository
+  userRepository,
 );
+
+const getAcademicYearsUseCase = new GetAcademicYearsUseCase(classRepository);
 
 export const classController = new ClassController(
   createClassUseCase,
@@ -55,4 +58,5 @@ export const classController = new ClassController(
   updateClassStatusUseCase,
   getClassSubjectsUseCase,
   assignClassSubjectUseCase,
+  getAcademicYearsUseCase,
 );

@@ -5,4 +5,5 @@ export interface GetClassesQuery {
   limit: number;
   search?: string;
   status?: ClassStatus;
+  academicYear?: string;
 }

@@ -13,13 +13,14 @@ export class GetClassesUseCase implements IGetClassesUseCase {
   async execute(
     query: GetClassesQuery,
   ): Promise<GetClassesResponse> {
-    const { page, limit, search, status } = query;
+    const { page, limit, search, status, academicYear } = query;
 
     const result = await this._classRepository.findAll(
       page,
       limit,
       search,
       status,
+      academicYear,
     );
 
     const totalPages = Math.ceil(result.total / limit);

@@ -2,10 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { getClasses } from "../services/class.service";
 
-import type {
-  ClassListItem,
-  GetClassesParams,
-} from "../types/class.types";
+import type { ClassListItem, GetClassesParams } from "../types/class.types";
 
 import { type ClassStatus } from "../types/class-status";
 
@@ -19,18 +16,22 @@ interface UseClassesReturn {
   setPage: (page: number) => void;
   search: string;
   statusFilter: ClassStatus | "ALL";
+  academicYear: string;
+  setAcademicYear: (year: string) => void;
   setSearch: (search: string) => void;
   setStatusFilter: (status: ClassStatus | "ALL") => void;
   fetchClasses: () => Promise<void>;
 }
 
-export function useClasses(): UseClassesReturn {
+export function useClasses(
+  academicYear: string,
+  onAcademicYearChange: (year: string) => void,
+): UseClassesReturn {
   const [classes, setClasses] = useState<ClassListItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState<ClassStatus | "ALL">("ALL");
+  const [statusFilter, setStatusFilter] = useState<ClassStatus | "ALL">("ALL");
 
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -39,12 +40,20 @@ export function useClasses(): UseClassesReturn {
   const [totalPages, setTotalPages] = useState(0);
 
   const fetchClasses = useCallback(async () => {
+    if (!academicYear) {
+      setClasses([]);
+      setTotal(0);
+      setTotalPages(0);
+      return;
+    }
+
     try {
       setIsLoading(true);
 
       const params: GetClassesParams = {
         page,
         limit,
+        academicYear,
       };
 
       if (search.trim()) {
@@ -59,14 +68,16 @@ export function useClasses(): UseClassesReturn {
 
       setClasses(result.classes);
       setTotal(result.total);
-      setPage(result.page);
+      if (result.page !== page) {
+        setPage(result.page);
+      }
       setTotalPages(result.totalPages);
     } catch (error) {
       console.error("Failed to fetch classes:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, search, statusFilter]);
+  }, [page, limit, search, statusFilter, academicYear]);
 
   useEffect(() => {
     const loadClasses = async () => {
@@ -75,6 +86,11 @@ export function useClasses(): UseClassesReturn {
 
     loadClasses();
   }, [fetchClasses]);
+
+  const handleAcademicYearChange = (year: string) => {
+    onAcademicYearChange(year);
+    setPage(1);
+  };
 
   return {
     classes,
@@ -86,6 +102,8 @@ export function useClasses(): UseClassesReturn {
     setPage,
     search,
     statusFilter,
+    academicYear,
+    setAcademicYear: handleAcademicYearChange,
     setSearch,
     setStatusFilter,
     fetchClasses,

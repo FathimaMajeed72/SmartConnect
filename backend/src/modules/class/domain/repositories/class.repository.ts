@@ -7,7 +7,8 @@ export interface IClassRepository extends IBaseRepository<ClassEntity> {
     page: number,
     limit: number,
     search?: string,
-    status?: ClassStatus
+    status?: ClassStatus,
+    academicYear?: string,
   ): Promise<{
     classes: ClassEntity[];
     total: number;
@@ -20,4 +21,6 @@ export interface IClassRepository extends IBaseRepository<ClassEntity> {
   ): Promise<ClassEntity | null>;
 
   updateStatus(id: string, status: ClassStatus): Promise<ClassEntity>;
+
+  getAcademicYears(): Promise<string[]>;
 }
