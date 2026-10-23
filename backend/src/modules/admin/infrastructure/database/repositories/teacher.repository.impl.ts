@@ -36,7 +36,9 @@ export class TeacherRepositoryImpl
       return null;
     }
 
-    return this.toDomain(document);
+    const teacher = this.toDomain(document);
+
+    return teacher;
   }
 
   async findByTeacherId(teacherId: string): Promise<Teacher | null> {
@@ -61,5 +63,11 @@ export class TeacherRepositoryImpl
       .lean();
 
     return document?.teacherId ?? null;
+  }
+
+  async findAll(): Promise<Teacher[]> {
+    const documents = await this._model.find().sort({ teacherId: 1 });
+
+    return documents.map((document) => TeacherMapper.toDomain(document));
   }
 }

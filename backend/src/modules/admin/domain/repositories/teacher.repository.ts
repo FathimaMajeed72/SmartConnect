@@ -10,4 +10,6 @@ export interface ITeacherRepository
   findByTeacherId(teacherId: string): Promise<Teacher | null>;
 
   findLatestTeacherId(): Promise<string | null>;
+
+  findAll(): Promise<Teacher[]>;
 }

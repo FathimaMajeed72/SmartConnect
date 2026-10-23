@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { ClassSubjectEntity } from "../../domain/entities/class-subject.entity";
-import { ClassSubjectDocument } from "../database/models/class-subject.model"; 
+import { ClassSubjectEntity } from "../../../domain/entities/class-subject.entity";
+import { ClassSubjectDocument } from "../models/class-subject.model"; 
 
 export class ClassSubjectMapper {
   static toDomain(

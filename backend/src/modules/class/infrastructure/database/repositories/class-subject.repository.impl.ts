@@ -10,7 +10,7 @@ import {
   ClassSubjectModel,
 } from "../models/class-subject.model";
 
-import { ClassSubjectMapper } from "../../mappers/class-subject.mapper";
+import { ClassSubjectMapper } from "../mappers/class-subject.mapper";
 
 import { BaseRepositoryImpl } from "../../../../../shared/infrastructure/database/base.repository.impl";
 

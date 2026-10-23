@@ -4,6 +4,7 @@ import authRoutes from "../../modules/auth/presentation/routes/auth.routes";
 import adminRoutes from "../../modules/admin/presentation/routes/admin.routes";
 import classRoutes from "../../modules/class/presentation/routes/class.routes";
 import subjectRoutes from "../../modules/subject/presentation/routes/subject.routes"
+import batchRoutes from "../../modules/batch/presentation/routes/batch.routes"
 import { HttpStatusCode } from "../../shared/enums/http-status-code.enum";
 
 const router = Router();
@@ -17,7 +18,9 @@ router.get("/", (_req, res) => {
 
 router.use("/auth", authRoutes);
 router.use("/admin", adminRoutes);
+router.use("/admin/classes", batchRoutes);
 router.use("/admin/classes", classRoutes);
 router.use("/admin/subjects", subjectRoutes);
+
 
 export default router;

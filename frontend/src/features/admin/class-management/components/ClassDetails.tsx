@@ -7,6 +7,7 @@ import { Button } from "@/shared/ui/button";
 
 import { useClassSubjects } from "../hooks/use-class-subjects";
 import { AssignSubjectDialog } from "./AssignSubjectDialog";
+import BatchTab from "../../batch-management/components/BatchTab"; 
 
 interface ClassDetailsProps {
   classDetails: ClassListItem | null;
@@ -206,13 +207,7 @@ export default function ClassDetails({
           </div>
         )}
 
-        {activeTab === "batches" && (
-          <div className="flex min-h-75 items-center justify-center">
-            <p className="text-sm text-muted-foreground">
-              Batches will be displayed here.
-            </p>
-          </div>
-        )}
+        {activeTab === "batches" && <BatchTab classId={classDetails.id} />}
       </div>
 
       <AssignSubjectDialog
