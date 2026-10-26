@@ -18,5 +18,6 @@ export const API_ROUTES = {
     SUBJECTS: "/admin/subjects",
     ACADEMIC_YEARS: "/admin/classes/academic-years",
     AVAILABLE_CLASS_TEACHERS: "/admin/classes/available-class-teachers",
+    STUDENTS: "/admin/students",
   },
 } as const;

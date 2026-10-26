@@ -17,6 +17,7 @@ import ActivateAccountPage from "@/features/auth/pages/ActivateAccountPage";
 import TeacherManagement from "@/features/admin/pages/TeacherManagement";
 import ClassManagement from "@/features/admin/pages/ClassManagement";
 import SubjectManagement from "@/features/admin/pages/SubjectManagement";
+import StudentManagement from "@/features/admin/pages/StudentManagement";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
               {
                 path: "/admin/subjects",
                 element: <SubjectManagement />,
+              },
+              {
+                path: "/admin/students",
+                element: <StudentManagement />,
               },
             ],
           },

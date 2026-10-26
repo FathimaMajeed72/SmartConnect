@@ -3,8 +3,9 @@ import { Router } from "express";
 import authRoutes from "../../modules/auth/presentation/routes/auth.routes";
 import adminRoutes from "../../modules/admin/presentation/routes/admin.routes";
 import classRoutes from "../../modules/class/presentation/routes/class.routes";
-import subjectRoutes from "../../modules/subject/presentation/routes/subject.routes"
-import batchRoutes from "../../modules/batch/presentation/routes/batch.routes"
+import subjectRoutes from "../../modules/subject/presentation/routes/subject.routes";
+import batchRoutes from "../../modules/batch/presentation/routes/batch.routes";
+import studentRoutes from "../../modules/student/presentation/routes/student.routes";
 import { HttpStatusCode } from "../../shared/enums/http-status-code.enum";
 
 const router = Router();
@@ -21,6 +22,7 @@ router.use("/admin", adminRoutes);
 router.use("/admin/classes", batchRoutes);
 router.use("/admin/classes", classRoutes);
 router.use("/admin/subjects", subjectRoutes);
+router.use("/admin/students", studentRoutes);
 
 
 export default router;
