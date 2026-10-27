@@ -21,6 +21,8 @@ export class StudentParentErrorStatusMapper implements IErrorStatusMapper {
     [StudentParentErrorCode.INACTIVE_STUDENT]: HttpStatusCode.BAD_REQUEST,
 
     [StudentParentErrorCode.INACTIVE_PARENT]: HttpStatusCode.BAD_REQUEST,
+
+    [StudentParentErrorCode.INACTIVE_STUDENT_PARENT_RELATIONSHIP]: HttpStatusCode.BAD_REQUEST,
   };
 
   getStatusCode(errorCode: string): HttpStatusCode | undefined {

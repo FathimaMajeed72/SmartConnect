@@ -7,12 +7,14 @@ import { sendError, sendSuccess } from "../../../../shared/presentation/helpers/
 import { IAssignParentToStudentUseCase } from "../../application/use-case-interfaces/assign-parent-to-student.use-case.interface";
 import { IGetStudentParentsUseCase } from "../../application/use-case-interfaces/get-student-parents.use-case.interface";
 import { IUpdateStudentParentStatusUseCase } from "../../application/use-case-interfaces/update-student-parent-status.use-case.interface";
+import { IUpdateStudentParentUseCase } from "../../application/use-case-interfaces/update-student-parent.use-case.interface";
 
 export class AssignParentToStudentController {
   constructor(
     private readonly _assignParentToStudentUseCase: IAssignParentToStudentUseCase,
     private readonly _getStudentParentsUseCase: IGetStudentParentsUseCase,
     private readonly _updateStudentParentStatusUseCase: IUpdateStudentParentStatusUseCase,
+    private readonly _updateStudentParentUseCase: IUpdateStudentParentUseCase,
   ) {}
 
   async assignParentToStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -76,6 +78,38 @@ export class AssignParentToStudentController {
         res,
         HttpStatusCode.OK,
         "Parent-student relationship status updated successfully.",
+        result,
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateStudentParent(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { studentId, parentUserId } = req.params;
+
+      if (typeof studentId !== "string" || !Types.ObjectId.isValid(studentId)) {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid student id.");
+        return;
+      }
+
+      if (typeof parentUserId !== "string" || !Types.ObjectId.isValid(parentUserId)) {
+        sendError(res, HttpStatusCode.BAD_REQUEST, "Invalid parent user id.");
+        return;
+      }
+
+      const result = await this._updateStudentParentUseCase.execute({
+        studentId,
+        parentUserId,
+        relationship: req.body.relationship,
+        isPrimaryContact: req.body.isPrimaryContact,
+      });
+
+      sendSuccess(
+        res,
+        HttpStatusCode.OK,
+        "Parent-student relationship updated successfully.",
         result,
       );
     } catch (error) {

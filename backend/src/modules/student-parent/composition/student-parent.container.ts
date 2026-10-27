@@ -7,6 +7,7 @@ import { UserRepositoryImpl } from "../../auth/infrastructure/database/repositor
 import { AssignParentToStudentUseCase } from "../application/use-cases/assign-parent-to-student.use-case";
 import { GetStudentParentsUseCase } from "../application/use-cases/get-student-parents.use-case";
 import { UpdateStudentParentStatusUseCase } from "../application/use-cases/update-student-parent-status.use-case";
+import { UpdateStudentParentUseCase } from "../application/use-cases/update-student-parent.use-case";
 
 const studentParentRepository = new StudentParentRepositoryImpl();
 
@@ -31,8 +32,14 @@ const updateStudentParentStatusUseCase = new UpdateStudentParentStatusUseCase(
   studentParentRepository,
 );
 
+const updateStudentParentUseCase = new UpdateStudentParentUseCase(
+  studentRepository,
+  studentParentRepository,
+);
+
 export const studentParentController = new AssignParentToStudentController(
   assignParentToStudentUseCase,
   getStudentParentsUseCase,
   updateStudentParentStatusUseCase,
+  updateStudentParentUseCase,
 );

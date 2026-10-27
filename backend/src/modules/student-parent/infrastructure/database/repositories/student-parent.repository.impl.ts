@@ -10,6 +10,7 @@ import { StudentParentMapper } from "../mappers/student-parent.mapper";
 
 import { BaseRepositoryImpl } from "../../../../../shared/infrastructure/database/base.repository.impl";
 import { DuplicateKeyError } from "../../../../../shared/errors/duplicate-key.error";
+import { PrimaryContactAlreadyExistsError } from "../../../application/errors/primary-contact-already-exists.error";
 
 export class StudentParentRepositoryImpl
   extends BaseRepositoryImpl<StudentParentEntity, IStudentParentDocument>
@@ -29,6 +30,25 @@ export class StudentParentRepositoryImpl
     try {
       return await super.create(entity);
     } catch (error) {
+      if (isDuplicatePrimaryContactError(error)) {
+        throw new PrimaryContactAlreadyExistsError();
+      }
+      if (isDuplicateStudentParentError(error)) {
+        throw new DuplicateKeyError("studentId_parentUserId");
+      }
+
+      throw error;
+    }
+  }
+
+  override async update(entity: StudentParentEntity): Promise<StudentParentEntity> {
+    try {
+      return await super.update(entity);
+    } catch (error) {
+      if (isDuplicatePrimaryContactError(error)) {
+        throw new PrimaryContactAlreadyExistsError();
+      }
+
       if (isDuplicateStudentParentError(error)) {
         throw new DuplicateKeyError("studentId_parentUserId");
       }
@@ -73,7 +93,6 @@ export class StudentParentRepositoryImpl
   }
 }
 
-
 function isDuplicateStudentParentError(error: unknown): boolean {
   if (
     typeof error !== "object" ||
@@ -92,5 +111,25 @@ function isDuplicateStudentParentError(error: unknown): boolean {
     keyPattern !== null &&
     "studentId" in keyPattern &&
     "parentUserId" in keyPattern
+  );
+}
+function isDuplicatePrimaryContactError(error: unknown): boolean {
+  if (
+    typeof error !== "object" ||
+    error === null ||
+    !("code" in error) ||
+    error.code !== 11000 ||
+    !("keyPattern" in error)
+  ) {
+    return false;
+  }
+
+  const keyPattern = error.keyPattern;
+
+  return (
+    typeof keyPattern === "object" &&
+    keyPattern !== null &&
+    "studentId" in keyPattern &&
+    !("parentUserId" in keyPattern)
   );
 }

@@ -12,6 +12,7 @@ import { assignParentToStudentSchema } from "../validators/assign-parent-to-stud
 
 import { STUDENT_PARENT_ROUTES } from "./student-parent.routes.constants"; 
 import { updateStudentParentStatusSchema } from "../validators/update-student-parent-status.validator";
+import { updateStudentParentSchema } from "../validators/update-student-parent.validator";
 
 const router = Router();
 
@@ -36,6 +37,16 @@ router.patch(
   authorize(Role.ADMIN),
   validate(updateStudentParentStatusSchema),
   studentParentController.updateStudentParentStatus.bind(
+    studentParentController,
+  ),
+);
+
+router.patch(
+  STUDENT_PARENT_ROUTES.UPDATE,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(updateStudentParentSchema),
+  studentParentController.updateStudentParent.bind(
     studentParentController,
   ),
 );
