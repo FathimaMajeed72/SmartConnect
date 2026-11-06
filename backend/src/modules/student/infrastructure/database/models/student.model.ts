@@ -1,4 +1,4 @@
-import { Schema, model, type Document } from "mongoose";
+import { Schema, Types, model, type Document } from "mongoose";
 
 import { Gender } from "../../../domain/enums/gender.enum";
 import { StudentStatus } from "../../../domain/enums/student-status.enum";
@@ -10,6 +10,8 @@ export interface IStudentDocument extends Document {
   dateOfBirth: Date;
   gender: Gender;
   profileImage?: string;
+  classId: Types.ObjectId;
+  batchId?: Types.ObjectId;
   status: StudentStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -53,6 +55,18 @@ const studentSchema = new Schema<IStudentDocument>(
       trim: true,
     },
 
+    classId: {
+      type: Schema.Types.ObjectId,
+      ref: "Class",
+      required: true,
+    },
+
+    batchId: {
+      type: Schema.Types.ObjectId,
+      ref: "Batch",
+      default: undefined,
+    },
+
     status: {
       type: String,
       enum: Object.values(StudentStatus),
@@ -64,7 +78,4 @@ const studentSchema = new Schema<IStudentDocument>(
   },
 );
 
-export const StudentModel = model<IStudentDocument>(
-  "Student",
-  studentSchema,
-);
+export const StudentModel = model<IStudentDocument>("Student", studentSchema);

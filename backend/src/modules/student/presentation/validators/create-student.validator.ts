@@ -28,4 +28,9 @@ export const createStudentSchema = z.object({
   gender: z.enum(Gender),
 
   profileImage: z.string().trim().optional(),
+
+  classId: z
+  .string()
+  .trim()
+  .min(1, "Class is required."),
 });

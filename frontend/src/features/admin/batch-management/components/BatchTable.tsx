@@ -1,8 +1,6 @@
 import { Pencil, Power } from "lucide-react";
 
-import DataTable, {
-  type DataTableColumn,
-} from "@/shared/components/DataTable";
+import DataTable, { type DataTableColumn } from "@/shared/components/DataTable";
 
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
@@ -14,6 +12,7 @@ interface BatchTableProps {
   isLoading: boolean;
   onEdit: (batch: BatchListItem) => void;
   onToggleStatus: (batch: BatchListItem) => void;
+  onAssignStudents: (batch: BatchListItem) => void;
 }
 
 export default function BatchTable({
@@ -21,19 +20,16 @@ export default function BatchTable({
   isLoading,
   onEdit,
   onToggleStatus,
+  onAssignStudents,
 }: BatchTableProps) {
   const columns: DataTableColumn<BatchListItem>[] = [
     {
       header: "Batch Name",
-      cell: (batch) => (
-        <span className="font-medium">{batch.name}</span>
-      ),
+      cell: (batch) => <span className="font-medium">{batch.name}</span>,
     },
     {
       header: "Class Teacher",
-      cell: (batch) => (
-        <span>{batch.classTeacherName || "—"}</span>
-      ),
+      cell: (batch) => <span>{batch.classTeacherName || "—"}</span>,
     },
     {
       header: "Capacity",
@@ -42,9 +38,7 @@ export default function BatchTable({
     {
       header: "Status",
       cell: (batch) => (
-        <Badge
-          variant={batch.status === "ACTIVE" ? "default" : "secondary"}
-        >
+        <Badge variant={batch.status === "ACTIVE" ? "default" : "secondary"}>
           {batch.status === "ACTIVE" ? "Active" : "Inactive"}
         </Badge>
       ),
@@ -62,6 +56,15 @@ export default function BatchTable({
             disabled={batch.status === "INACTIVE"}
           >
             <Pencil className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onAssignStudents(batch)}
+            disabled={batch.status === "INACTIVE"}
+          >
+            Assign Students
           </Button>
 
           <Button

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { StudentStatus } from "../../domain/enums/student-status.enum";
+import { Types } from "mongoose";
 
 export const getStudentsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -9,4 +10,9 @@ export const getStudentsSchema = z.object({
   search: z.string().trim().optional(),
 
   status: z.enum(StudentStatus).optional(),
+
+  classId: z
+    .string()
+    .refine((value) => Types.ObjectId.isValid(value), { message: "Invalid class ID" })
+    .optional(),
 });

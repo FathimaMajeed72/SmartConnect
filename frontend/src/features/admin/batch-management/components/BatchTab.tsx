@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/shared/ui/button";
 
@@ -12,6 +11,7 @@ import EditBatchDialog from "./EditBatchDialog";
 import ActivateBatchDialog from "./ActivateBatchDialog";
 
 import type { BatchListItem } from "../types/batch.type";
+import AssignStudentsDialog from "./AssignStudentsDialog";
 
 interface BatchTabProps {
   classId: string;
@@ -36,6 +36,12 @@ export default function BatchTab({ classId }: BatchTabProps) {
 
   const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
 
+  const [batchToAssignStudents, setBatchToAssignStudents] =
+    useState<BatchListItem | null>(null);
+
+  const [isAssignStudentsDialogOpen, setIsAssignStudentsDialogOpen] =
+    useState(false);
+
   const batches = data?.batches ?? [];
 
   const handleToggleStatus = (batch: BatchListItem) => {
@@ -44,11 +50,6 @@ export default function BatchTab({ classId }: BatchTabProps) {
         {
           batchId: batch.id,
           status: "INACTIVE",
-        },
-        {
-          onError: () => {
-            toast.error("Failed to deactivate batch.");
-          },
         },
       );
 
@@ -61,6 +62,11 @@ export default function BatchTab({ classId }: BatchTabProps) {
   const handleEdit = (batch: BatchListItem) => {
     setSelectedBatch(batch);
     setIsEditDialogOpen(true);
+  };
+
+  const handleAssignStudents = (batch: BatchListItem) => {
+    setBatchToAssignStudents(batch);
+    setIsAssignStudentsDialogOpen(true);
   };
 
   if (isError) {
@@ -98,6 +104,7 @@ export default function BatchTab({ classId }: BatchTabProps) {
         isLoading={isLoading}
         onEdit={handleEdit}
         onToggleStatus={handleToggleStatus}
+        onAssignStudents={handleAssignStudents}
       />
 
       {/* Add Batch Dialog */}
@@ -130,6 +137,18 @@ export default function BatchTab({ classId }: BatchTabProps) {
 
           if (!open) {
             setBatchToActivate(null);
+          }
+        }}
+      />
+      <AssignStudentsDialog
+        classId={classId}
+        batch={batchToAssignStudents}
+        open={isAssignStudentsDialogOpen}
+        onOpenChange={(open) => {
+          setIsAssignStudentsDialogOpen(open);
+
+          if (!open) {
+            setBatchToAssignStudents(null);
           }
         }}
       />

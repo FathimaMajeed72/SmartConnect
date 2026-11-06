@@ -10,11 +10,21 @@ import { StudentAlreadyExistsError } from "../errors/student-already-exists.erro
 
 import { StudentDtoMapper } from "../mappers/student-dto.mapper";
 import { DuplicateKeyError } from "../../../../shared/errors/duplicate-key.error";
+import { IClassRepository } from "../../../class/domain/repositories/class.repository";
+import { EntityNotFoundError } from "../../../../shared/errors/entity-not-found.error";
 
 export class CreateStudentUseCase implements ICreateStudentUseCase {
-  constructor(private readonly _studentRepository: IStudentRepository) {}
+  constructor(
+    private readonly _studentRepository: IStudentRepository,
+    private readonly _classRepository: IClassRepository,
+  ) {}
 
   async execute(request: CreateStudentRequest): Promise<CreateStudentResponse> {
+    const classEntity = await this._classRepository.findById(request.classId);
+
+    if (!classEntity) {
+      throw new EntityNotFoundError("Class");
+    }
     const admissionNumber = request.admissionNumber.trim().toUpperCase();
 
     const existingStudent = await this._studentRepository.findByAdmissionNumber(admissionNumber);
@@ -31,6 +41,7 @@ export class CreateStudentUseCase implements ICreateStudentUseCase {
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
       profileImage: request.profileImage,
+      classId: request.classId,
       status: StudentStatus.ACTIVE,
       createdAt: new Date(),
       updatedAt: new Date(),

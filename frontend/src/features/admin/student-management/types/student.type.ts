@@ -10,6 +10,8 @@ export interface StudentListItem {
   dateOfBirth: string;
   gender: Gender;
   profileImage?: string;
+  classId: string;
+  batchId?: string;
   status: StudentStatus;
   createdAt: string;
   updatedAt: string;
@@ -28,6 +30,7 @@ export interface GetStudentsParams {
   limit: number;
   search?: string;
   status?: StudentStatus;
+  classId?: string;
 }
 
 export interface CreateStudentRequest {
@@ -48,3 +51,8 @@ export interface UpdateStudentStatusRequest {
 }
 
 export type UpdateStudentStatusResponse = StudentListItem;
+
+export interface AssignStudentsToBatchRequest {
+  batchId: string;
+  studentIds: string[];
+}

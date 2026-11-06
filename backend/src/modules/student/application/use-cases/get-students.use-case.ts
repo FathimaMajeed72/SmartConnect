@@ -11,13 +11,14 @@ export class GetStudentsUseCase implements IGetStudentsUseCase {
   async execute(
     query: GetStudentsQuery,
   ): Promise<GetStudentsResponse> {
-    const { page, limit, search, status } = query;
+    const { page, limit, search, status, classId } = query;
 
     const result = await this._studentRepository.findAll(
       page,
       limit,
       search,
       status,
+      classId,
     );
 
     const totalPages = Math.ceil(result.total / limit);

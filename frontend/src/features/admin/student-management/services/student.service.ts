@@ -9,6 +9,7 @@ import type {
   GetStudentResponse,
   UpdateStudentStatusRequest,
   UpdateStudentStatusResponse,
+  AssignStudentsToBatchRequest,
 } from "../types/student.type";
 
 export const getStudents = async (
@@ -51,6 +52,26 @@ export const updateStudentStatus = async (
 ): Promise<UpdateStudentStatusResponse> => {
   const response = await api.patch(
     `${API_ROUTES.ADMIN.STUDENTS}/${id}/status`,
+    data,
+  );
+
+  return response.data.data;
+};
+
+export const assignStudentsToBatch = async (
+  data: AssignStudentsToBatchRequest,
+): Promise<void> => {
+  await api.patch(
+    `${API_ROUTES.ADMIN.STUDENTS}/assign-to-batch`,
+    data,
+  );
+};
+
+export const unassignStudentsFromBatch = async (
+  data: AssignStudentsToBatchRequest,
+): Promise<{ unassignedCount: number }> => {
+  const response = await api.patch(
+    `${API_ROUTES.ADMIN.STUDENTS}/unassign-from-batch`,
     data,
   );
 

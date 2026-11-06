@@ -1,4 +1,4 @@
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 
 import { StudentEntity } from "../../../domain/entities/student.entity";
 import { StudentStatus } from "../../../domain/enums/student-status.enum";
@@ -31,6 +31,7 @@ export class StudentRepositoryImpl
     limit: number,
     search?: string,
     status?: StudentStatus,
+    classId?: string,
   ): Promise<{
     students: StudentEntity[];
     total: number;
@@ -64,6 +65,10 @@ export class StudentRepositoryImpl
 
     if (status) {
       filter.status = status;
+    }
+
+    if (classId) {
+      filter.classId = new Types.ObjectId(classId);
     }
 
     const safePage = Math.max(page, 1);
@@ -100,9 +105,70 @@ export class StudentRepositoryImpl
       },
     );
 
-
     return document ? this.toDomain(document) : null;
   }
+
+  async findByIds(ids: string[]): Promise<StudentEntity[]> {
+    const documents = await this._model.find({
+      _id: { $in: ids },
+    });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
+  async findByBatchId(batchId: string): Promise<StudentEntity[]> {
+    const documents = await this._model.find({ batchId });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
+  async findAvailableByClassId(classId: string): Promise<StudentEntity[]> {
+    const documents = await this._model.find({
+      classId,
+      batchId: { $exists: false },
+    });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
+  async countByBatchId(batchId: string): Promise<number> {
+    return this._model.countDocuments({ batchId });
+  }
+
+  async assignToBatch(studentIds: string[], batchId: string): Promise<number> {
+    const result = await this._model.updateMany(
+      {
+        _id: { $in: studentIds },
+      },
+      {
+        $set: {
+          batchId: new Types.ObjectId(batchId),
+        },
+      },
+      {
+        runValidators: true,
+      },
+    );
+
+    return result.modifiedCount;
+  }
+
+  async unassignFromBatch(studentIds: string[], batchId: string): Promise<number> {
+    const result = await this._model.updateMany(
+      {
+        _id: { $in: studentIds },
+        batchId: new Types.ObjectId(batchId),
+      },
+      {
+        $unset: {
+          batchId: "",
+        },
+      },
+    );
+
+    return result.modifiedCount;
+  }
+
   override async create(entity: StudentEntity): Promise<StudentEntity> {
     try {
       return await super.create(entity);

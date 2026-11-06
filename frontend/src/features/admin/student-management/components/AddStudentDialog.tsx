@@ -16,15 +16,30 @@ import { Input } from "@/shared/ui/input";
 
 import { toast } from "sonner";
 import { getErrorMessage } from "@/core/utils/getErrorMessage";
+import { useAcademicYears } from "../../class-management/hooks/use-academic-years";
+import { useClasses } from "../../class-management/hooks/use-classes";
 
 interface AddStudentDialogProps {
   onSuccess?: () => void;
 }
 
-export default function AddStudentDialog({
-  onSuccess,
-}: AddStudentDialogProps) {
+export default function AddStudentDialog({ onSuccess }: AddStudentDialogProps) {
   const [open, setOpen] = useState(false);
+
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
+
+  const { academicYears, isLoading: isAcademicYearsLoading } =
+    useAcademicYears();
+
+  const academicYear = academicYears.includes(selectedAcademicYear)
+    ? selectedAcademicYear
+    : (academicYears[0] ?? "");
+
+  const { classes, isLoading: isClassesLoading } = useClasses(
+    academicYear,
+    setSelectedAcademicYear,
+  );
+
   const createStudentMutation = useCreateStudent();
 
   const form = useForm<CreateStudentFormData>({
@@ -35,6 +50,7 @@ export default function AddStudentDialog({
       lastName: "",
       dateOfBirth: "",
       gender: "OTHER",
+      classId: "",
       profileImage: "",
     },
   });
@@ -91,10 +107,7 @@ export default function AddStudentDialog({
       <div className="space-y-2">
         <label className="text-sm font-medium">First Name</label>
 
-        <Input
-          placeholder="Enter first name"
-          {...form.register("firstName")}
-        />
+        <Input placeholder="Enter first name" {...form.register("firstName")} />
 
         {form.formState.errors.firstName && (
           <p className="text-sm text-destructive">
@@ -107,10 +120,7 @@ export default function AddStudentDialog({
       <div className="space-y-2">
         <label className="text-sm font-medium">Last Name</label>
 
-        <Input
-          placeholder="Enter last name"
-          {...form.register("lastName")}
-        />
+        <Input placeholder="Enter last name" {...form.register("lastName")} />
 
         {form.formState.errors.lastName && (
           <p className="text-sm text-destructive">
@@ -149,6 +159,37 @@ export default function AddStudentDialog({
         {form.formState.errors.gender && (
           <p className="text-sm text-destructive">
             {form.formState.errors.gender.message}
+          </p>
+        )}
+      </div>
+
+      {/* Class */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Class</label>
+
+        <select
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          {...form.register("classId")}
+          disabled={isAcademicYearsLoading || isClassesLoading}
+        >
+          <option value="">
+            {isAcademicYearsLoading || isClassesLoading
+              ? "Loading classes..."
+              : "Select class"}
+          </option>
+
+          {classes
+            .filter((item) => item.status === "ACTIVE")
+            .map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name} ({item.code})
+              </option>
+            ))}
+        </select>
+
+        {form.formState.errors.classId && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.classId.message}
           </p>
         )}
       </div>

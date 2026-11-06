@@ -14,6 +14,8 @@ import { BatchTeacherNotFoundError } from "../errors/batch-teacher-not-found.err
 import { BatchTeacherInactiveError } from "../errors/batch-teacher-inactive.error";
 import { UserStatus } from "../../../auth/domain/enums/user-status.enum";
 import { BatchTeacherAlreadyAssignedError } from "../errors/batch-teacher-already-assigned.error";
+import { IStudentRepository } from "../../../student/domain/repositories/student.repository";
+import { BatchHasAssignedStudentsError } from "../errors/batch-has-assigned-students.error";
 
 export class UpdateBatchStatusUseCase implements IUpdateBatchStatusUseCase {
   constructor(
@@ -21,6 +23,7 @@ export class UpdateBatchStatusUseCase implements IUpdateBatchStatusUseCase {
     private readonly _classRepository: IClassRepository,
     private readonly _teacherRepository: ITeacherRepository,
     private readonly _userRepository: IUserRepository,
+    private readonly _studentRepository: IStudentRepository,
   ) {}
 
   async execute(
@@ -28,8 +31,6 @@ export class UpdateBatchStatusUseCase implements IUpdateBatchStatusUseCase {
     batchId: string,
     request: UpdateBatchStatusRequest,
   ): Promise<UpdateBatchStatusResponse> {
-
-
     const classEntity = await this._classRepository.findById(classId);
 
     if (!classEntity) {
@@ -44,6 +45,14 @@ export class UpdateBatchStatusUseCase implements IUpdateBatchStatusUseCase {
 
     if (!batch || batch.classId !== classEntity.id) {
       throw new BatchNotFoundError();
+    }
+
+    if (request.status === BatchStatus.INACTIVE) {
+      const studentCount = await this._studentRepository.countByBatchId(batchId);
+
+      if (studentCount > 0) {
+        throw new BatchHasAssignedStudentsError();
+      }
     }
 
     let classTeacherId: string | null = null;
