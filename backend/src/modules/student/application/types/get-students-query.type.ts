@@ -5,4 +5,5 @@ export interface GetStudentsQuery {
   limit: number;
   search?: string;
   status?: StudentStatus;
+  classId?: string;
 }

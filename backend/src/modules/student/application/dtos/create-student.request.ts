@@ -7,4 +7,5 @@ export interface CreateStudentRequest {
   dateOfBirth: Date;
   gender: Gender;
   profileImage?: string;
+  classId: string;
 }

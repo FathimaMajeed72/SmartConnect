@@ -23,10 +23,7 @@ export const createStudentSchema = z.object({
     .string()
     .trim()
     .min(1, "Date of birth is required.")
-    .regex(
-      /^\d{4}-\d{2}-\d{2}$/,
-      "Date of birth must be in YYYY-MM-DD format.",
-    )
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date of birth must be in YYYY-MM-DD format.")
     .refine((value) => {
       const date = new Date(`${value}T00:00:00.000Z`);
 
@@ -44,6 +41,8 @@ export const createStudentSchema = z.object({
     error: "Please select a gender.",
   }),
 
+  classId: z.string().min(1, "Please select a class."),
+
   profileImage: z
     .string()
     .trim()
@@ -51,6 +50,4 @@ export const createStudentSchema = z.object({
     .optional(),
 });
 
-export type CreateStudentFormData = z.infer<
-  typeof createStudentSchema
->;
+export type CreateStudentFormData = z.infer<typeof createStudentSchema>;

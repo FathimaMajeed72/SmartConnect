@@ -25,6 +25,8 @@ export class BatchErrorStatusMapper implements IErrorStatusMapper {
     [BatchErrorCode.INVALID_BATCH_STATUS]: HttpStatusCode.BAD_REQUEST,  
     
     [BatchErrorCode.BATCH_INACTIVE]: HttpStatusCode.BAD_REQUEST,
+
+    [BatchErrorCode.BATCH_HAS_ASSIGNED_STUDENTS]: HttpStatusCode.CONFLICT,
   };
 
   getStatusCode(errorCode: string): HttpStatusCode | undefined {

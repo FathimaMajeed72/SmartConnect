@@ -10,6 +10,7 @@ import { GetBatchUseCase } from "../application/use-cases/get-batch.use-case";
 import { UpdateBatchUseCase } from "../application/use-cases/update-batch.use-case";
 import { UpdateBatchStatusUseCase } from "../application/use-cases/update-batch-status.use-case";
 import { UserRepositoryImpl } from "../../auth/infrastructure/database/repositories/user.repository.impl";
+import { StudentRepositoryImpl } from "../../student/infrastructure/database/repositories/student.repository.impl";
 
 import { GetAvailableClassTeachersUseCase } from "../application/use-cases/get-available-class-teachers.use-case";
 
@@ -20,6 +21,8 @@ const classRepository = new ClassRepositoryImpl();
 const teacherRepository = new TeacherRepositoryImpl();
 
 const userRepository = new UserRepositoryImpl();
+
+const studentRepository = new StudentRepositoryImpl();
 
 const createBatchUseCase = new CreateBatchUseCase(
   batchRepository,
@@ -49,6 +52,7 @@ const updateBatchStatusUseCase = new UpdateBatchStatusUseCase(
   classRepository,
   teacherRepository,
   userRepository,
+  studentRepository,
 );
 
 const getAvailableClassTeachersUseCase = new GetAvailableClassTeachersUseCase(

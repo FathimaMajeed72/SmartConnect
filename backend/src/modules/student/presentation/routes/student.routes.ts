@@ -14,6 +14,8 @@ import { getStudentsSchema } from "../validators/get-students.validator";
 import { updateStudentStatusSchema } from "../validators/update-student-status.validator";
 
 import { STUDENT_ROUTES } from "./student.routes.constants";
+import { assignStudentsToBatchSchema } from "../validators/assign-students-to-batch.validator";
+import { unassignStudentsFromBatchSchema } from "../validators/unassign-students-from-batch.validator";
 
 const router = Router();
 
@@ -46,6 +48,22 @@ router.patch(
   authorize(Role.ADMIN),
   validate(updateStudentStatusSchema),
   studentController.updateStudentStatus.bind(studentController),
+);
+
+router.patch(
+  STUDENT_ROUTES.ASSIGN_TO_BATCH,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(assignStudentsToBatchSchema),
+  studentController.assignStudentsToBatch.bind(studentController),
+);
+
+router.patch(
+  STUDENT_ROUTES.UNASSIGN_FROM_BATCH,
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(unassignStudentsFromBatchSchema),
+  studentController.unassignStudentsFromBatch.bind(studentController),
 );
 
 export default router;

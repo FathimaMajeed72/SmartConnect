@@ -3,10 +3,7 @@ import { Types } from "mongoose";
 
 import { HttpStatusCode } from "../../../../shared/enums/http-status-code.enum";
 import { ValidatedQueryRequest } from "../../../../shared/presentation/middlewares/validate-query.middleware";
-import {
-  sendError,
-  sendSuccess,
-} from "../../../../shared/presentation/helpers/response.helper";
+import { sendError, sendSuccess } from "../../../../shared/presentation/helpers/response.helper";
 
 import { ICreateStudentUseCase } from "../../application/use-case-interfaces/create-student.use-case.interface";
 import { IGetStudentsUseCase } from "../../application/use-case-interfaces/get-students.use-case.interface";
@@ -14,6 +11,8 @@ import { IGetStudentUseCase } from "../../application/use-case-interfaces/get-st
 import { IUpdateStudentStatusUseCase } from "../../application/use-case-interfaces/update-student-status.use-case.interface";
 
 import { StudentStatus } from "../../domain/enums/student-status.enum";
+import { IAssignStudentsToBatchUseCase } from "../../application/use-case-interfaces/assign-students-to-batch.use-case.interface";
+import { IUnassignStudentsFromBatchUseCase } from "../../application/use-case-interfaces/unassign-students-from-batch.use-case.interface";
 
 export class StudentController {
   constructor(
@@ -21,64 +20,45 @@ export class StudentController {
     private readonly _getStudentsUseCase: IGetStudentsUseCase,
     private readonly _getStudentByIdUseCase: IGetStudentUseCase,
     private readonly _updateStudentStatusUseCase: IUpdateStudentStatusUseCase,
+    private readonly _assignStudentsToBatchUseCase: IAssignStudentsToBatchUseCase,
+    private readonly _unassignStudentsFromBatchUseCase: IUnassignStudentsFromBatchUseCase,
   ) {}
 
-  async createStudent(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async createStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const result = await this._createStudentUseCase.execute(req.body);
 
-      sendSuccess(
-        res,
-        HttpStatusCode.CREATED,
-        "Student created successfully.",
-        result,
-      );
+      sendSuccess(res, HttpStatusCode.CREATED, "Student created successfully.", result);
     } catch (error) {
       next(error);
     }
   }
 
-  async getStudents(
-    req: ValidatedQueryRequest,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async getStudents(req: ValidatedQueryRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { page, limit, search, status } =
-        req.validatedQuery as {
-          page: number;
-          limit: number;
-          search?: string;
-          status?: StudentStatus;
-        };
+      const { page, limit, search, status, classId } = req.validatedQuery as {
+        page: number;
+        limit: number;
+        search?: string;
+        status?: StudentStatus;
+        classId?: string;
+      };
 
       const result = await this._getStudentsUseCase.execute({
         page,
         limit,
         search,
         status,
+        classId,
       });
 
-      sendSuccess(
-        res,
-        HttpStatusCode.OK,
-        "Students retrieved successfully.",
-        result,
-      );
+      sendSuccess(res, HttpStatusCode.OK, "Students retrieved successfully.", result);
     } catch (error) {
       next(error);
     }
   }
 
-  async getStudent(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async getStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
 
@@ -89,22 +69,13 @@ export class StudentController {
 
       const result = await this._getStudentByIdUseCase.execute(id);
 
-      sendSuccess(
-        res,
-        HttpStatusCode.OK,
-        "Student retrieved successfully.",
-        result,
-      );
+      sendSuccess(res, HttpStatusCode.OK, "Student retrieved successfully.", result);
     } catch (error) {
       next(error);
     }
   }
 
-  async updateStudentStatus(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async updateStudentStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
 
@@ -118,10 +89,30 @@ export class StudentController {
         status: req.body.status,
       });
 
+      sendSuccess(res, HttpStatusCode.OK, "Student status updated successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async assignStudentsToBatch(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await this._assignStudentsToBatchUseCase.execute(req.body);
+
+      sendSuccess(res, HttpStatusCode.OK, "Students assigned to batch successfully.");
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async unassignStudentsFromBatch(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this._unassignStudentsFromBatchUseCase.execute(req.body);
+
       sendSuccess(
         res,
         HttpStatusCode.OK,
-        "Student status updated successfully.",
+        `${result.unassignedCount} student(s) unassigned successfully.`,
         result,
       );
     } catch (error) {
