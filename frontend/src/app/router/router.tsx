@@ -18,6 +18,7 @@ import TeacherManagement from "@/features/admin/pages/TeacherManagement";
 import ClassManagement from "@/features/admin/pages/ClassManagement";
 import SubjectManagement from "@/features/admin/pages/SubjectManagement";
 import StudentManagement from "@/features/admin/pages/StudentManagement";
+import TeacherAttendance from "@/features/teacher/pages/TeacherAttendance";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
           {
             path: "/teacher/dashboard",
             element: <TeacherDashboard />,
+          },
+          {
+            path: "/teacher/attendance",
+            element: <TeacherAttendance />,
           },
         ],
       },

@@ -20,4 +20,8 @@ export const API_ROUTES = {
     AVAILABLE_CLASS_TEACHERS: "/admin/classes/available-class-teachers",
     STUDENTS: "/admin/students",
   },
+
+  TEACHER: {
+    ATTENDANCE: "/teacher/attendance",
+  },
 } as const;
