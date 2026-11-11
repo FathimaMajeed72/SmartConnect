@@ -22,6 +22,8 @@ export interface IStudentRepository extends IBaseRepository<StudentEntity> {
 
   findByBatchId(batchId: string): Promise<StudentEntity[]>;
 
+  findActiveByBatchId(batchId: string): Promise<StudentEntity[]>;
+
   findAvailableByClassId(classId: string): Promise<StudentEntity[]>;
 
   assignToBatch(studentIds: string[], batchId: string): Promise<number>;
