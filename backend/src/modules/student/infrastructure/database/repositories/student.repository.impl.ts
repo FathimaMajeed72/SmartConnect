@@ -135,6 +135,23 @@ export class StudentRepositoryImpl
     return documents.map((document) => this.toDomain(document));
   }
 
+  async findActiveByBatchIds(batchIds: string[]): Promise<StudentEntity[]> {
+    const validBatchIds = batchIds
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    if (validBatchIds.length === 0) {
+      return [];
+    }
+
+    const documents = await this._model.find({
+      batchId: { $in: validBatchIds },
+      status: StudentStatus.ACTIVE,
+    });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
   async findAvailableByClassId(classId: string): Promise<StudentEntity[]> {
     const documents = await this._model.find({
       classId,

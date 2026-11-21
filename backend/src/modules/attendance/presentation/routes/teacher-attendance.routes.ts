@@ -21,11 +21,13 @@ import {
   updateAttendanceParamsSchema,
   updateAttendanceSchema,
 } from "../validators/update-attendance.validator";
+import { getStudentAttendanceHistoryParamsSchema, getStudentAttendanceHistoryQuerySchema } from "../validators/get-student-attendance-history.validator";
+import { getStudentAttendanceSummaryParamsSchema, getStudentAttendanceSummaryQuerySchema } from "../validators/get-student-attendance-summary.validator";
 
 const router = Router();
 
 router.get(
-  "/my-batch",
+   ATTENDANCE_ROUTES.MY_BATCH,
   authenticate,
   authorize(Role.TEACHER),
   attendanceController.getMyBatch.bind(attendanceController),
@@ -40,7 +42,26 @@ router.post(
 );
 
 router.get(
-  `${ATTENDANCE_ROUTES.ROOT}:batchId`,
+  ATTENDANCE_ROUTES.STUDENT_HISTORY,
+  authenticate,
+  authorize(Role.TEACHER),
+  validateParams(getStudentAttendanceHistoryParamsSchema),
+  validateQuery(getStudentAttendanceHistoryQuerySchema),
+  attendanceController.getStudentAttendanceHistory.bind(attendanceController),
+);
+
+
+router.get(
+  ATTENDANCE_ROUTES.STUDENT_SUMMARY,
+  authenticate,
+  authorize(Role.TEACHER),
+  validateParams(getStudentAttendanceSummaryParamsSchema),
+  validateQuery(getStudentAttendanceSummaryQuerySchema),
+  attendanceController.getStudentAttendanceSummary.bind(attendanceController),
+);
+
+router.get(
+  ATTENDANCE_ROUTES.BATCH_ATTENDANCE,
   authenticate,
   authorize(Role.TEACHER),
   validateParams(getBatchAttendanceParamsSchema),
@@ -49,7 +70,7 @@ router.get(
 );
 
 router.patch(
-  `${ATTENDANCE_ROUTES.ROOT}:batchId`,
+  ATTENDANCE_ROUTES.BATCH_ATTENDANCE,
   authenticate,
   authorize(Role.TEACHER),
   validateParams(updateAttendanceParamsSchema),

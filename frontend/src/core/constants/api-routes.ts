@@ -19,6 +19,7 @@ export const API_ROUTES = {
     ACADEMIC_YEARS: "/admin/classes/academic-years",
     AVAILABLE_CLASS_TEACHERS: "/admin/classes/available-class-teachers",
     STUDENTS: "/admin/students",
+    ATTENDANCE: "/admin/attendance",
   },
 
   TEACHER: {

@@ -63,6 +63,22 @@ export class BatchRepositoryImpl
     return document ? BatchMapper.toDomain(document) : null;
   }
 
+  async findAllBatches(classId?: string): Promise<BatchEntity[]> {
+    const filter: Record<string, unknown> = {};
+
+    if (classId) {
+      if (!Types.ObjectId.isValid(classId)) {
+        return [];
+      }
+
+      filter.classId = new Types.ObjectId(classId);
+    }
+
+    const documents = await this._model.find(filter).sort({ name: 1 });
+
+    return documents.map((document) => BatchMapper.toDomain(document));
+  }
+
   async findAssignedClassTeacherIds(): Promise<string[]> {
     const documents = await this._model
       .find({

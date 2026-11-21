@@ -3,32 +3,29 @@ import { IGetBatchAttendanceUseCase } from "../use-case-interfaces/get-batch-att
 import { GetBatchAttendanceRequest } from "../dtos/get-batch-attendance.request";
 import { GetBatchAttendanceResponse } from "../dtos/get-batch-attendance.response";
 
-import { IAttendanceRepository } from "../../domain/repositories/attendance.repository";
 import { ITeacherRepository } from "../../../admin/domain/repositories/teacher.repository";
 import { IBatchRepository } from "../../../batch/domain/repositories/batch.repository";
-import { IStudentRepository } from "../../../student/domain/repositories/student.repository";
 
 import { BatchStatus } from "../../../batch/domain/enums/batch-status.enum";
+
+import { BatchAttendanceService } from "../services/batch-attendance.service";
 
 import { EntityNotFoundError } from "../../../../shared/errors/entity-not-found.error";
 import { AttendanceInactiveBatchError } from "../errors/attendance-inactive-batch.error";
 import { UnauthorizedBatchAccessError } from "../errors/unauthorized-batch-access.error";
+import { InvalidAttendanceDateError } from "../errors/invalid-attendance-date.error";
 
-export class GetBatchAttendanceUseCase
-  implements IGetBatchAttendanceUseCase
-{
+export class GetBatchAttendanceUseCase implements IGetBatchAttendanceUseCase {
   constructor(
-    private readonly _attendanceRepository: IAttendanceRepository,
     private readonly _teacherRepository: ITeacherRepository,
     private readonly _batchRepository: IBatchRepository,
-    private readonly _studentRepository: IStudentRepository,
+    private readonly _batchAttendanceService: BatchAttendanceService,
   ) {}
 
   async execute(
     request: GetBatchAttendanceRequest,
     userId: string,
   ): Promise<GetBatchAttendanceResponse> {
-
     const teacher = await this._teacherRepository.findByUserId(userId);
 
     if (!teacher) {
@@ -45,53 +42,37 @@ export class GetBatchAttendanceUseCase
       throw new AttendanceInactiveBatchError();
     }
 
-    if (
-      !batch.classTeacherId ||
-      batch.classTeacherId !== teacher.id
-    ) {
+    if (!batch.classTeacherId || batch.classTeacherId !== teacher.id) {
       throw new UnauthorizedBatchAccessError();
     }
 
-    const attendanceDate = new Date(
-      `${request.date}T00:00:00.000Z`,
-    );
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
-    const [students, attendanceRecords] = await Promise.all([
-      this._studentRepository.findActiveByBatchId(batch.id),
+    if (!datePattern.test(request.date)) {
+      throw new InvalidAttendanceDateError();
+    }
 
-      this._attendanceRepository.findByBatchAndDate(
+    const attendanceDate = new Date(`${request.date}T00:00:00.000Z`);
+
+    if (
+      Number.isNaN(attendanceDate.getTime()) ||
+      attendanceDate.toISOString().slice(0, 10) !== request.date
+    ) {
+      throw new InvalidAttendanceDateError();
+    }
+
+    const attendanceDetails =
+      await this._batchAttendanceService.getBatchAttendance(
         batch.id,
         attendanceDate,
-      ),
-    ]);
-
-    const attendanceMap = new Map(
-      attendanceRecords.map((record) => [
-        record.studentId,
-        record,
-      ]),
-    );
-
-    const studentAttendance = students.map((student) => {
-      const attendance = attendanceMap.get(student.id);
-
-      return {
-        studentId: student.id,
-        admissionNumber: student.admissionNumber,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        profileImage: student.profileImage,
-        status: attendance?.status ?? null,
-        remarks: attendance?.remarks,
-      };
-    });
+      );
 
     return {
       batchId: batch.id,
       date: request.date,
-      totalStudents: students.length,
-      attendanceMarked: attendanceRecords.length > 0,
-      students: studentAttendance,
+      totalStudents: attendanceDetails.totalStudents,
+      attendanceMarked: attendanceDetails.attendanceMarked,
+      students: attendanceDetails.students,
     };
   }
 }

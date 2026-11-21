@@ -7,7 +7,8 @@ import subjectRoutes from "../../modules/subject/presentation/routes/subject.rou
 import batchRoutes from "../../modules/batch/presentation/routes/batch.routes";
 import studentRoutes from "../../modules/student/presentation/routes/student.routes";
 import { HttpStatusCode } from "../../shared/enums/http-status-code.enum";
-import attendanceRoutes  from "../../modules/attendance/presentation/routes/attendance.routes";
+import adminAttendanceRoutes from "../../modules/attendance/presentation/routes/admin-attendance.routes";
+import teacherAttendanceRoutes  from "../../modules/attendance/presentation/routes/teacher-attendance.routes";
 
 const router = Router();
 
@@ -25,7 +26,7 @@ router.use("/admin/classes", classRoutes);
 router.use("/admin/subjects", subjectRoutes);
 router.use("/admin/students", studentRoutes);
 
-router.use("/teacher/attendance", attendanceRoutes);
-
+router.use("/admin/attendance", adminAttendanceRoutes);
+router.use("/teacher/attendance", teacherAttendanceRoutes);
 
 export default router;

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateSchema } from "../../../../shared/presentation/validators/date.validator";
 
 export const getBatchAttendanceParamsSchema = z.object({
   batchId: z.string().regex(
@@ -8,13 +9,5 @@ export const getBatchAttendanceParamsSchema = z.object({
 });
 
 export const getBatchAttendanceQuerySchema = z.object({
-  date: z.string().refine((value) => {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return false;
-    }
-
-    const parsedDate = new Date(`${value}T00:00:00.000Z`);
-
-    return parsedDate.toISOString().slice(0, 10) === value;
-  }, "Invalid attendance date."),
+  date: dateSchema,
 });

@@ -46,7 +46,7 @@ export interface MarkAttendanceResponse {
   absent: number;
   late: number;
   excused: number;
-  submittedAt: Date;
+  submittedAt: string;
 }
 
 export interface UpdateAttendanceRequest {
@@ -65,5 +65,46 @@ export interface UpdateAttendanceResponse {
   status: AttendanceStatus;
   remarks?: string;
   updatedBy: string;
-  updatedAt: Date;
+  updatedAt: string;
+}
+
+export interface GetStudentAttendanceHistoryRequest {
+  studentId: string;
+  startDate?: string;
+  endDate?: string;
+  page: number;
+  limit: number;
+}
+
+export interface StudentAttendanceRecord {
+  attendanceId: string;
+  date: string;
+  status: AttendanceStatus;
+  remarks?: string;
+}
+
+export interface GetStudentAttendanceHistoryResponse {
+  studentId: string;
+  attendance: StudentAttendanceRecord[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface GetStudentAttendanceSummaryRequest {
+  studentId: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface GetStudentAttendanceSummaryResponse {
+  studentId: string;
+  present: number;
+  absent: number;
+  late: number;
+  excused: number;
+  totalAttendanceDays: number;
+  attendedDays: number;
+  attendancePercentage: number;
 }

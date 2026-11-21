@@ -7,4 +7,4 @@ export const useBatches = (classId: string) => {
     queryFn: () => getBatches(classId),
     enabled: Boolean(classId),
   });
-};
+}; 

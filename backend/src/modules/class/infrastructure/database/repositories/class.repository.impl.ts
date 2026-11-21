@@ -86,6 +86,18 @@ export class ClassRepositoryImpl
     };
   }
 
+  async findAllClasses(): Promise<ClassEntity[]> {
+    const documents = await this._model.find().sort({ name: 1 });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
+  async findByAcademicYear(academicYear: string): Promise<ClassEntity[]> {
+    const documents = await this._model.find({ academicYear }).sort({ name: 1 });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
   async findByCodeOrNameAndAcademicYear(
     code: string,
     name: string,

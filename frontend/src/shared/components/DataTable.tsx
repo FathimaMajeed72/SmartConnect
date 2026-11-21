@@ -22,6 +22,7 @@ interface DataTableProps<T> {
   loadingMessage?: string;
   emptyMessage?: string;
   getRowKey: (item: T) => string;
+  headerClassName?: string;
 }
 
 export default function DataTable<T>({
@@ -31,12 +32,13 @@ export default function DataTable<T>({
   loadingMessage = "Loading...",
   emptyMessage = "No data found.",
   getRowKey,
+  headerClassName,
 }: DataTableProps<T>) {
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className={headerClassName}>
             {columns.map((column) => (
               <TableHead key={column.header} className={column.className}>
                 {column.header}
@@ -48,10 +50,7 @@ export default function DataTable<T>({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
+              <TableCell colSpan={columns.length} className="h-24 text-center">
                 {loadingMessage}
               </TableCell>
             </TableRow>
@@ -67,10 +66,7 @@ export default function DataTable<T>({
             ))
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
+              <TableCell colSpan={columns.length} className="h-24 text-center">
                 {emptyMessage}
               </TableCell>
             </TableRow>

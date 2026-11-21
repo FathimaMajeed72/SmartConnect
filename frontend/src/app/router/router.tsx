@@ -19,6 +19,7 @@ import ClassManagement from "@/features/admin/pages/ClassManagement";
 import SubjectManagement from "@/features/admin/pages/SubjectManagement";
 import StudentManagement from "@/features/admin/pages/StudentManagement";
 import TeacherAttendance from "@/features/teacher/pages/TeacherAttendance";
+import AdminAttendance from "@/features/admin/pages/AdminAttendance";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
               {
                 path: "/admin/students",
                 element: <StudentManagement />,
+              },
+              {
+                path: "/admin/attendance",
+                element: <AdminAttendance />,
               },
             ],
           },

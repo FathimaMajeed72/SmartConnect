@@ -9,6 +9,8 @@ export interface IBatchRepository extends IBaseRepository<BatchEntity> {
 
   findByClassTeacherId(classTeacherId: string): Promise<BatchEntity | null>;
 
+  findAllBatches(classId?: string): Promise<BatchEntity[]>;
+
   findAssignedClassTeacherIds(): Promise<string[]>;
 
   updateBatch(

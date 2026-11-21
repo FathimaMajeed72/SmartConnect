@@ -14,6 +14,10 @@ export interface IClassRepository extends IBaseRepository<ClassEntity> {
     total: number;
   }>;
 
+  findAllClasses(): Promise<ClassEntity[]>;
+
+  findByAcademicYear(academicYear: string): Promise<ClassEntity[]>;
+
   findByCodeOrNameAndAcademicYear(
     code: string,
     name: string,

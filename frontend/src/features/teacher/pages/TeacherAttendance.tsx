@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { ClipboardCheck } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
@@ -16,6 +18,9 @@ import AttendanceSummaryCards from "../attendance/components/AttendanceSummaryCa
 import type { AttendanceSummary } from "../attendance/components/AttendanceSummaryCards";
 import AttendanceStudentTable from "../attendance/components/AttendanceStudentTable";
 import AttendanceConfirmationDialog from "../attendance/components/AttendanceConfirmationDialog";
+import { useUpdateAttendance } from "../attendance/hooks/use-update-attendance";
+import { getErrorMessage } from "@/core/utils/getErrorMessage";
+import StudentAttendanceHistoryDialog from "../attendance/components/StudentAttendanceHistoryDialog";
 
 const getTodayDate = () => {
   return new Intl.DateTimeFormat("en-CA", {
@@ -31,6 +36,8 @@ const TeacherAttendance = () => {
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+  const [isEditing, setIsEditing] = useState(false);
+
   const [attendanceChanges, setAttendanceChanges] = useState<{
     key: string;
     values: Record<string, AttendanceStatus>;
@@ -38,6 +45,18 @@ const TeacherAttendance = () => {
     key: "",
     values: {},
   });
+
+  const [remarksChanges, setRemarksChanges] = useState<{
+    key: string;
+    values: Record<string, string>;
+  }>({
+    key: "",
+    values: {},
+  });
+
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+    null,
+  );
 
   const {
     data: myBatch,
@@ -55,6 +74,10 @@ const TeacherAttendance = () => {
 
   const markAttendanceMutation = useMarkAttendance();
 
+  const updateAttendanceMutation = useUpdateAttendance();
+
+  const queryClient = useQueryClient();
+
   const attendanceKey = `${myBatch?.batchId}-${selectedDate}`;
 
   const currentAttendanceChanges =
@@ -65,6 +88,17 @@ const TeacherAttendance = () => {
     existingStatus: AttendanceStatus | null,
   ) => {
     return currentAttendanceChanges[studentId] ?? existingStatus ?? "";
+  };
+
+  const getStudentRemarks = (studentId: string, existingRemarks?: string) => {
+    if (
+      remarksChanges.key === attendanceKey &&
+      remarksChanges.values[studentId] !== undefined
+    ) {
+      return remarksChanges.values[studentId];
+    }
+
+    return existingRemarks ?? "";
   };
 
   const attendanceSummary: AttendanceSummary = {
@@ -129,6 +163,8 @@ const TeacherAttendance = () => {
           student.studentId,
           student.status,
         ) as AttendanceStatus,
+        remarks:
+          getStudentRemarks(student.studentId, student.remarks) || undefined,
       })),
     };
 
@@ -136,10 +172,12 @@ const TeacherAttendance = () => {
       onSuccess: () => {
         toast.success("Attendance submitted successfully.");
         setAttendanceChanges({ key: "", values: {} });
+        setRemarksChanges({ key: "", values: {} });
+
         setIsConfirmOpen(false);
       },
-      onError: () => {
-        toast.error("Failed to submit attendance. Please try again.");
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
       },
     });
   };
@@ -152,6 +190,123 @@ const TeacherAttendance = () => {
         [studentId]: status,
       },
     }));
+  };
+
+  const handleRemarksChange = (studentId: string, remarks: string) => {
+    setRemarksChanges((previous) => ({
+      key: attendanceKey,
+      values: {
+        ...(previous.key === attendanceKey ? previous.values : {}),
+        [studentId]: remarks,
+      },
+    }));
+  };
+
+  const handleEditAttendance = () => {
+    setAttendanceChanges({
+      key: attendanceKey,
+      values: {},
+    });
+
+    setRemarksChanges({
+      key: attendanceKey,
+      values: {},
+    });
+
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setAttendanceChanges({
+      key: attendanceKey,
+      values: {},
+    });
+
+    setRemarksChanges({
+      key: attendanceKey,
+      values: {},
+    });
+
+    setIsEditing(false);
+  };
+
+  const handleSaveChanges = async () => {
+    if (!myBatch || !attendanceData || updateAttendanceMutation.isPending) {
+      return;
+    }
+
+    const modifiedStudents = attendanceData.students.filter((student) => {
+      const currentStatus = getStudentStatus(student.studentId, student.status);
+
+      const currentRemarks = getStudentRemarks(
+        student.studentId,
+        student.remarks,
+      );
+
+      const originalRemarks = student.remarks ?? "";
+
+      return (
+        currentStatus !== student.status || currentRemarks !== originalRemarks
+      );
+    });
+
+    if (modifiedStudents.length === 0) {
+      toast.info("No changes to save.");
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      const results = await Promise.allSettled(
+        modifiedStudents.map((student) =>
+          updateAttendanceMutation.mutateAsync({
+            batchId: myBatch.batchId,
+            studentId: student.studentId,
+            date: selectedDate,
+            status: getStudentStatus(
+              student.studentId,
+              student.status,
+            ) as AttendanceStatus,
+            remarks: getStudentRemarks(student.studentId, student.remarks),
+          }),
+        ),
+      );
+
+      const failedUpdates = results.filter(
+        (result) => result.status === "rejected",
+      );
+
+      if (failedUpdates.length > 0) {
+        toast.error(
+          `${failedUpdates.length} student attendance update(s) failed. Please retry.`,
+        );
+        return;
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: ["attendance", myBatch.batchId, selectedDate],
+      });
+
+      toast.success("Attendance updated successfully.");
+
+      setAttendanceChanges({ key: "", values: {} });
+      setRemarksChanges({
+        key: "",
+        values: {},
+      });
+      setIsEditing(false);
+    } catch {
+      toast.error("Failed to update attendance. Please try again.");
+    }
+  };
+
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+    setIsEditing(false);
+    setIsConfirmOpen(false);
+
+    setAttendanceChanges({ key: "", values: {} });
+    setRemarksChanges({ key: "", values: {} });
   };
 
   if (isBatchLoading) {
@@ -205,7 +360,7 @@ const TeacherAttendance = () => {
         batchName={myBatch.batchName}
         selectedDate={selectedDate}
         maxDate={getTodayDate()}
-        onDateChange={setSelectedDate}
+        onDateChange={handleDateChange}
       />
 
       {/* Attendance Summary */}
@@ -216,26 +371,73 @@ const TeacherAttendance = () => {
         students={attendanceData.students}
         getStudentStatus={getStudentStatus}
         onStatusChange={handleStatusChange}
+        getStudentRemarks={getStudentRemarks}
+        onRemarksChange={handleRemarksChange}
         attendanceMarked={attendanceData.attendanceMarked}
+        isEditing={isEditing}
+        onViewHistory={setSelectedStudentId}
       />
 
-      <div className="flex justify-end">
-        <Button
-          onClick={() => setIsConfirmOpen(true)}
-          disabled={
-            attendanceData?.attendanceMarked ||
-            !isAttendanceComplete ||
-            attendanceData?.students.length === 0 ||
-            markAttendanceMutation.isPending
-          }
-        >
-          {markAttendanceMutation.isPending
-            ? "Submitting..."
-            : attendanceData?.attendanceMarked
-              ? "Attendance Submitted"
+      <div className="flex justify-end gap-3">
+        {attendanceData.attendanceMarked ? (
+          isEditing ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleCancelEdit}
+                disabled={updateAttendanceMutation.isPending}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                onClick={handleSaveChanges}
+                disabled={updateAttendanceMutation.isPending}
+              >
+                {updateAttendanceMutation.isPending
+                  ? "Saving..."
+                  : "Save Changes"}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={handleEditAttendance}>Edit Attendance</Button>
+          )
+        ) : (
+          <Button
+            onClick={() => setIsConfirmOpen(true)}
+            disabled={
+              !isAttendanceComplete ||
+              attendanceData.students.length === 0 ||
+              markAttendanceMutation.isPending
+            }
+          >
+            {markAttendanceMutation.isPending
+              ? "Submitting..."
               : "Submit Attendance"}
-        </Button>
+          </Button>
+        )}
       </div>
+
+      {selectedStudentId && (
+        <StudentAttendanceHistoryDialog
+          open={Boolean(selectedStudentId)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedStudentId(null);
+            }
+          }}
+          studentId={selectedStudentId}
+          studentName={(() => {
+            const student = attendanceData.students.find(
+              (item) => item.studentId === selectedStudentId,
+            );
+
+            return student
+              ? `${student.firstName} ${student.lastName}`
+              : "Student";
+          })()}
+        />
+      )}
 
       <AttendanceConfirmationDialog
         open={isConfirmOpen}

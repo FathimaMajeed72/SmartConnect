@@ -25,12 +25,15 @@ import { IncompleteAttendanceError } from "../errors/incomplete-attendance.error
 import { AttendanceAlreadyMarkedError } from "../errors/attendance-already-marked.error";
 import { DuplicateKeyError } from "../../../../shared/errors/duplicate-key.error";
 
+import { ITransactionManager } from "../../../../shared/domain/transactions/transaction-manager.interface";
+
 export class MarkAttendanceUseCase implements IMarkAttendanceUseCase {
   constructor(
     private readonly _attendanceRepository: IAttendanceRepository,
     private readonly _teacherRepository: ITeacherRepository,
     private readonly _batchRepository: IBatchRepository,
     private readonly _studentRepository: IStudentRepository,
+    private readonly _transactionManager: ITransactionManager,
   ) {}
 
   async execute(request: MarkAttendanceRequest, userId: string): Promise<MarkAttendanceResponse> {
@@ -130,7 +133,9 @@ export class MarkAttendanceUseCase implements IMarkAttendanceUseCase {
     let savedAttendance: AttendanceEntity[];
 
     try {
-      savedAttendance = await this._attendanceRepository.createMany(attendanceEntities);
+      savedAttendance = await this._transactionManager.execute(async (context) => {
+        return this._attendanceRepository.createMany(attendanceEntities, context);
+      });
     } catch (error) {
       if (error instanceof DuplicateKeyError) {
         throw new AttendanceAlreadyMarkedError();

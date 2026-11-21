@@ -8,6 +8,10 @@ import type {
   MarkAttendanceResponse,
   UpdateAttendanceRequest,
   UpdateAttendanceResponse,
+  GetStudentAttendanceHistoryRequest,
+  GetStudentAttendanceHistoryResponse,
+  GetStudentAttendanceSummaryRequest,
+  GetStudentAttendanceSummaryResponse,
 } from "../types/attendance.types"
 
 
@@ -55,3 +59,35 @@ export const updateAttendance = async (
 
   return response.data.data;
 };
+
+export const getStudentAttendanceHistory = async (
+  params: GetStudentAttendanceHistoryRequest,
+): Promise<GetStudentAttendanceHistoryResponse> => {
+  const { studentId, ...queryParams } = params;
+
+  const response = await api.get(
+    `${API_ROUTES.TEACHER.ATTENDANCE}/students/${studentId}/history`,
+    {
+      params: queryParams,
+    },
+  );
+
+  return response.data.data;
+};
+
+
+export const getStudentAttendanceSummary = async (
+  params: GetStudentAttendanceSummaryRequest,
+): Promise<GetStudentAttendanceSummaryResponse> => {
+  const { studentId, ...queryParams } = params;
+
+  const response = await api.get(
+    `${API_ROUTES.TEACHER.ATTENDANCE}/students/${studentId}/summary`,
+    {
+      params: queryParams,
+    },
+  );
+
+  return response.data.data;
+};
+
