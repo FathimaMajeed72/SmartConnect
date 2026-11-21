@@ -18,6 +18,7 @@ import { ClassErrorStatusMapper } from "../modules/class/presentation/mappers/cl
 import { SubjectErrorStatusMapper } from "../modules/subject/presentation/mappers/subject-error-status.mapper";
 import { BatchErrorStatusMapper } from "../modules/batch/presentation/mappers/batch-error-status.mapper";
 import { StudentErrorStatusMapper } from "../modules/student/presentation/mappers/student-error-status.mapper";
+import { StudentParentErrorStatusMapper } from "../modules/student-parent/presentation/mappers/student-parent-error-status.mapper";
 
 const app = express();
 
@@ -27,6 +28,7 @@ const classErrorStatusMapper = new ClassErrorStatusMapper();
 const subjectErrorStatusMapper = new SubjectErrorStatusMapper();
 const batchErrorStatusMapper = new BatchErrorStatusMapper();
 const studentErrorStatusMapper = new StudentErrorStatusMapper();
+const studentParentErrorStatusMapper = new StudentParentErrorStatusMapper();
 const commonErrorStatusMapper = new CommonErrorStatusMapper();
 
 const errorStatusMapper = new CompositeErrorStatusMapper([
@@ -36,6 +38,7 @@ const errorStatusMapper = new CompositeErrorStatusMapper([
   subjectErrorStatusMapper,
   batchErrorStatusMapper,
   studentErrorStatusMapper,
+  studentParentErrorStatusMapper,
   commonErrorStatusMapper,
 ]);
 
