@@ -5,6 +5,5 @@ export const pageTitles: Record<string, string> = {
   "/admin/students": "Students",
   "/admin/classes": "Classes",
   "/admin/subjects": "Subjects",
-  "/admin/batches": "Batches",
   "/admin/settings": "Settings",
 };

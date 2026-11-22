@@ -5,10 +5,9 @@ import {
   UserRound,
   School,
   BookOpen,
-  CalendarRange,
   ClipboardCheck,
 } from "lucide-react";
-import type { SidebarItem } from "../types/sidebar";
+import type { SidebarItem } from "../../../shared/types/sidebar";
 
 export const sidebarItems: SidebarItem[] = [
   {
@@ -40,11 +39,6 @@ export const sidebarItems: SidebarItem[] = [
     title: "Subjects",
     path: "/admin/subjects",
     icon: BookOpen,
-  },
-  {
-    title: "Batches",
-    path: "/admin/batches",
-    icon: CalendarRange,
   },
   {
     title: "Attendance",

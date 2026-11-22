@@ -20,6 +20,8 @@ import SubjectManagement from "@/features/admin/pages/SubjectManagement";
 import StudentManagement from "@/features/admin/pages/StudentManagement";
 import TeacherAttendance from "@/features/teacher/pages/TeacherAttendance";
 import AdminAttendance from "@/features/admin/pages/AdminAttendance";
+import TeacherLayout from "@/features/teacher/layouts/TeacherLayout";
+import ParentLayout from "@/features/parent/layouts/ParentLayout";
 
 const router = createBrowserRouter([
   {
@@ -96,12 +98,17 @@ const router = createBrowserRouter([
         element: <RoleProtectedRoute allowedRole="TEACHER" />,
         children: [
           {
-            path: "/teacher/dashboard",
-            element: <TeacherDashboard />,
-          },
-          {
-            path: "/teacher/attendance",
-            element: <TeacherAttendance />,
+            element: <TeacherLayout />,
+            children: [
+              {
+                path: "/teacher/dashboard",
+                element: <TeacherDashboard />,
+              },
+              {
+                path: "/teacher/attendance",
+                element: <TeacherAttendance />,
+              },
+            ],
           },
         ],
       },
@@ -109,8 +116,13 @@ const router = createBrowserRouter([
         element: <RoleProtectedRoute allowedRole="PARENT" />,
         children: [
           {
-            path: "/parent/dashboard",
-            element: <ParentDashboard />,
+            element: <ParentLayout />,
+            children: [
+              {
+                path: "/parent/dashboard",
+                element: <ParentDashboard />,
+              },
+            ],
           },
         ],
       },

@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../../../shared/components/Sidebar";
 import Topbar from "../components/Topbar";
+import { sidebarItems } from "../config/sidebar";
 
 export default function AdminLayout() {
   return (
     <div className="flex min-h-screen">
       <div className="hidden w-64 border-r lg:block">
-        <Sidebar />
+        <Sidebar items={sidebarItems} dashboardPath="/admin/dashboard" />
       </div>
 
       <div className="flex flex-1 flex-col">

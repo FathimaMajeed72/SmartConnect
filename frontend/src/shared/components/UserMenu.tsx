@@ -14,24 +14,33 @@ import { useAppSelector } from "@/app/store/hooks";
 
 export default function UserMenu() {
   const { user } = useAppSelector((state) => state.auth);
+  const initials =
+    `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
+        <button className="flex items-center gap-3 rounded-lg p-1 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary">
           <Avatar>
-            <AvatarFallback>AD</AvatarFallback>
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
+
+          <div className="hidden flex-col items-start sm:flex">
+            <span className="text-sm font-medium">
+              {user?.firstName} {user?.lastName}
+            </span>
+            <span className="text-xs text-muted-foreground">{user?.role}</span>
+          </div>
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col">
-            <span className="font-medium">{user?.firstName}</span>
-            <span className="text-xs text-muted-foreground">
-              {user?.email}
+            <span className="font-medium">
+              {user?.firstName} {user?.lastName}
             </span>
+            <span className="text-xs text-muted-foreground">{user?.email}</span>
           </div>
         </DropdownMenuLabel>
 
