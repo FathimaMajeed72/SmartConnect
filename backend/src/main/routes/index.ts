@@ -11,6 +11,7 @@ import { HttpStatusCode } from "../../shared/enums/http-status-code.enum";
 import adminAttendanceRoutes from "../../modules/attendance/presentation/routes/admin-attendance.routes";
 import teacherAttendanceRoutes  from "../../modules/attendance/presentation/routes/teacher-attendance.routes";
 import parentStudentRoutes from "../../modules/student-parent/presentation/routes/parent-student.routes";
+import parentAttendanceRoutes from "../../modules/attendance/presentation/routes/parent-attendance.routes";
 
 
 const router = Router();
@@ -32,6 +33,7 @@ router.use("/admin/students", studentParentRoutes);
 
 router.use("/admin/attendance", adminAttendanceRoutes);
 router.use("/teacher/attendance", teacherAttendanceRoutes);
+router.use("/parent/attendance", parentAttendanceRoutes);
 
 router.use("/parent/student-parents", parentStudentRoutes);
 

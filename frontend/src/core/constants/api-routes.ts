@@ -28,5 +28,6 @@ export const API_ROUTES = {
 
   PARENT: {
     CHILDREN: "/parent/student-parents/children",
+    ATTENDANCE: "/parent/attendance",
   },
 } as const;

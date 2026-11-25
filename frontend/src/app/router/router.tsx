@@ -23,7 +23,7 @@ import AdminAttendance from "@/features/admin/pages/AdminAttendance";
 import TeacherLayout from "@/features/teacher/layouts/TeacherLayout";
 import ParentLayout from "@/features/parent/layouts/ParentLayout";
 import ChildDashboard from "@/features/parent/pages/ChildDashboard";
-
+import ParentAttendance from "@/features/parent/pages/ParentAttendance";
 
 const router = createBrowserRouter([
   {
@@ -127,6 +127,10 @@ const router = createBrowserRouter([
               {
                 path: "/parent/children/:childId",
                 element: <ChildDashboard />,
+              },
+              {
+                path: "/parent/attendance",
+                element: <ParentAttendance />,
               },
             ],
           },

@@ -7,6 +7,11 @@ export interface IStudentParentRepository extends IBaseRepository<StudentParentE
     parentUserId: string,
   ): Promise<StudentParentEntity | null>;
 
+  findActiveByStudentAndParent(
+    studentId: string,
+    parentUserId: string,
+  ): Promise<StudentParentEntity | null>;
+
   findByStudentId(studentId: string): Promise<StudentParentEntity[]>;
 
   findByParentUserId(parentUserId: string): Promise<StudentParentEntity[]>;

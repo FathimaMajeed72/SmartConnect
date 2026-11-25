@@ -17,6 +17,7 @@ import { IGetStudentAttendanceSummaryUseCase } from "../../application/use-case-
 import { GetSchoolAttendanceRequest } from "../../application/dtos/get-school-attendance.request";
 import { IGetSchoolAttendanceUseCase } from "../../application/use-case-interfaces/get-school-attendance.use-case.interface";
 import { IGetAdminBatchAttendanceUseCase } from "../../application/use-case-interfaces/get-admin-batch-attendance.use-case.interface";
+import { IGetParentAttendanceUseCase } from "../../application/use-case-interfaces/get-parent-attendance.use-case";
 
 interface ValidatedAttendanceRequest
   extends AuthenticatedRequest, ValidatedParamsRequest, ValidatedQueryRequest {}
@@ -31,6 +32,7 @@ export class AttendanceController {
     private readonly _getStudentAttendanceSummaryUseCase: IGetStudentAttendanceSummaryUseCase,
     private readonly _getSchoolAttendanceUseCase: IGetSchoolAttendanceUseCase,
     private readonly _getAdminBatchAttendanceUseCase: IGetAdminBatchAttendanceUseCase,
+    private readonly _getParentAttendanceUseCase: IGetParentAttendanceUseCase,
   ) {}
 
   async markAttendance(
@@ -231,4 +233,39 @@ export class AttendanceController {
     }
   }
 
+  //Parent
+
+  async getParentAttendance(
+    req: ValidatedAttendanceRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { studentId } = req.validatedParams as {
+        studentId: string;
+      };
+
+      const { startDate, endDate, page, limit } = req.validatedQuery as {
+        startDate?: string;
+        endDate?: string;
+        page: number;
+        limit: number;
+      };
+
+      const result = await this._getParentAttendanceUseCase.execute(
+        {
+          studentId,
+          startDate,
+          endDate,
+          page,
+          limit,
+        },
+        req.user!.userId,
+      );
+
+      sendSuccess(res, HttpStatusCode.OK, "Parent attendance retrieved successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

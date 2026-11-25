@@ -69,6 +69,19 @@ export class StudentParentRepositoryImpl
     return document ? this.toDomain(document) : null;
   }
 
+  async findActiveByStudentAndParent(
+    studentId: string,
+    parentUserId: string,
+  ): Promise<StudentParentEntity | null> {
+    const document = await this._model.findOne({
+      studentId,
+      parentUserId,
+      status: StudentParentStatus.ACTIVE,
+    });
+
+    return document ? this.toDomain(document) : null;
+  }
+
   async findByStudentId(studentId: string): Promise<StudentParentEntity[]> {
     const documents = await this._model.find({ studentId }).sort({ createdAt: -1 });
 

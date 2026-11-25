@@ -18,6 +18,8 @@ import { GetStudentAttendanceSummaryUseCase } from "../application/use-cases/get
 import { GetSchoolAttendanceUseCase } from "../application/use-cases/get-school-attendance.use-case";
 import { BatchAttendanceService } from "../application/services/batch-attendance.service";
 import { GetAdminBatchAttendanceUseCase } from "../application/use-cases/get-admin-batch-attendance.use-case";
+import { StudentParentRepositoryImpl } from "../../student-parent/infrastructure/database/repositories/student-parent.repository.impl";
+import { GetParentAttendanceUseCase } from "../application/use-cases/get-parent-attendance.use-case";
 
 const attendanceRepository = new AttendanceRepositoryImpl();
 const teacherRepository = new TeacherRepositoryImpl();
@@ -25,6 +27,7 @@ const batchRepository = new BatchRepositoryImpl();
 const studentRepository = new StudentRepositoryImpl();
 const classRepository = new ClassRepositoryImpl();
 const transactionManager = new MongoTransactionManager();
+const studentParentRepository = new StudentParentRepositoryImpl();
 
 const batchAttendanceService = new BatchAttendanceService(
   attendanceRepository,
@@ -85,6 +88,11 @@ const getAdminBatchAttendanceUseCase =
     batchAttendanceService,
   );
 
+  const getParentAttendanceUseCase = new GetParentAttendanceUseCase(
+  attendanceRepository,
+  studentParentRepository,
+);
+
 export const attendanceController = new AttendanceController(
   markAttendanceUseCase,
   getBatchAttendanceUseCase,
@@ -94,4 +102,5 @@ export const attendanceController = new AttendanceController(
   getStudentAttendanceSummaryUseCase,
   getSchoolAttendanceUseCase,
   getAdminBatchAttendanceUseCase,
+  getParentAttendanceUseCase,
 );

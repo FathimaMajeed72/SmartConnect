@@ -32,6 +32,8 @@ export class AttendanceErrorStatusMapper implements IErrorStatusMapper {
     [AttendanceErrorCode.ATTENDANCE_ALREADY_MARKED]: HttpStatusCode.CONFLICT,
 
     [AttendanceErrorCode.INVALID_ATTENDANCE_DATE]: HttpStatusCode.BAD_REQUEST,
+
+    [AttendanceErrorCode.PARENT_STUDENT_ACCESS_DENIED]: HttpStatusCode.FORBIDDEN,
   };
 
   getStatusCode(errorCode: string): HttpStatusCode | undefined {
