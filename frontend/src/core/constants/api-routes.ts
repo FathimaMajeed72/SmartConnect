@@ -25,4 +25,8 @@ export const API_ROUTES = {
   TEACHER: {
     ATTENDANCE: "/teacher/attendance",
   },
+
+  PARENT: {
+    CHILDREN: "/parent/student-parents/children",
+  },
 } as const;

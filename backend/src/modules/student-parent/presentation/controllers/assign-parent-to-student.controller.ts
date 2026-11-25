@@ -8,6 +8,8 @@ import { IAssignParentToStudentUseCase } from "../../application/use-case-interf
 import { IGetStudentParentsUseCase } from "../../application/use-case-interfaces/get-student-parents.use-case.interface";
 import { IUpdateStudentParentStatusUseCase } from "../../application/use-case-interfaces/update-student-parent-status.use-case.interface";
 import { IUpdateStudentParentUseCase } from "../../application/use-case-interfaces/update-student-parent.use-case.interface";
+import { IGetParentChildrenUseCase } from "../../application/use-case-interfaces/get-parent-children.use-case";
+import { AuthenticatedRequest } from "../../../../shared/presentation/middlewares/authenticate.middleware";
 
 export class AssignParentToStudentController {
   constructor(
@@ -15,6 +17,7 @@ export class AssignParentToStudentController {
     private readonly _getStudentParentsUseCase: IGetStudentParentsUseCase,
     private readonly _updateStudentParentStatusUseCase: IUpdateStudentParentStatusUseCase,
     private readonly _updateStudentParentUseCase: IUpdateStudentParentUseCase,
+    private readonly _getParentChildrenUseCase: IGetParentChildrenUseCase,
   ) {}
 
   async assignParentToStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -112,6 +115,27 @@ export class AssignParentToStudentController {
         "Parent-student relationship updated successfully.",
         result,
       );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getParentChildren(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const parentUserId = req.user?.userId;
+
+      if (!parentUserId) {
+        sendError(res, HttpStatusCode.UNAUTHORIZED, "Authentication required.");
+        return;
+      }
+
+      const result = await this._getParentChildrenUseCase.execute(parentUserId);
+
+      sendSuccess(res, HttpStatusCode.OK, "Parent children retrieved successfully.", result);
     } catch (error) {
       next(error);
     }

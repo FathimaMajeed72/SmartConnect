@@ -8,12 +8,19 @@ import { AssignParentToStudentUseCase } from "../application/use-cases/assign-pa
 import { GetStudentParentsUseCase } from "../application/use-cases/get-student-parents.use-case";
 import { UpdateStudentParentStatusUseCase } from "../application/use-cases/update-student-parent-status.use-case";
 import { UpdateStudentParentUseCase } from "../application/use-cases/update-student-parent.use-case";
+import { GetParentChildrenUseCase } from "../application/use-cases/get-parent-children.use-case";
+import { ClassRepositoryImpl } from "../../class/infrastructure/database/repositories/class.repository.impl";
+import { BatchRepositoryImpl } from "../../batch/infrastructure/database/repositories/batch.repository.impl";
 
 const studentParentRepository = new StudentParentRepositoryImpl();
 
 const studentRepository = new StudentRepositoryImpl();
 
 const userRepository = new UserRepositoryImpl();
+
+const classRepository = new ClassRepositoryImpl();
+
+const batchRepository = new BatchRepositoryImpl();
 
 const assignParentToStudentUseCase = new AssignParentToStudentUseCase(
   studentRepository,
@@ -37,9 +44,17 @@ const updateStudentParentUseCase = new UpdateStudentParentUseCase(
   studentParentRepository,
 );
 
+const getParentChildrenUseCase = new GetParentChildrenUseCase(
+  studentParentRepository,
+  studentRepository,
+  classRepository,
+  batchRepository,
+);
+
 export const studentParentController = new AssignParentToStudentController(
   assignParentToStudentUseCase,
   getStudentParentsUseCase,
   updateStudentParentStatusUseCase,
   updateStudentParentUseCase,
+  getParentChildrenUseCase,
 );

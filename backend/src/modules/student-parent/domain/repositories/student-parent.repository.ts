@@ -9,5 +9,7 @@ export interface IStudentParentRepository extends IBaseRepository<StudentParentE
 
   findByStudentId(studentId: string): Promise<StudentParentEntity[]>;
 
+  findByParentUserId(parentUserId: string): Promise<StudentParentEntity[]>;
+
   existsActivePrimaryContact(studentId: string, excludeRelationshipId?: string): Promise<boolean>;
 }

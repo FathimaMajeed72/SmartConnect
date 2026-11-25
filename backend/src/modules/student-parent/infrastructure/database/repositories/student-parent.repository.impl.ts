@@ -75,6 +75,17 @@ export class StudentParentRepositoryImpl
     return documents.map((document) => this.toDomain(document));
   }
 
+  async findByParentUserId(parentUserId: string): Promise<StudentParentEntity[]> {
+    const documents = await this._model
+      .find({
+        parentUserId,
+        status: StudentParentStatus.ACTIVE,
+      })
+      .sort({ createdAt: -1 });
+
+    return documents.map((document) => this.toDomain(document));
+  }
+
   async existsActivePrimaryContact(
     studentId: string,
     excludeRelationshipId?: string,

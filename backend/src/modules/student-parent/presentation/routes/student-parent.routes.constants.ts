@@ -3,4 +3,5 @@ export const STUDENT_PARENT_ROUTES = {
   BY_STUDENT: "/:studentId/parents",
   STATUS: "/:studentId/parents/:parentUserId/status",
   UPDATE: "/:studentId/parents/:parentUserId",
+  PARENT_CHILDREN: "/children",
 } as const;

@@ -10,6 +10,7 @@ import studentParentRoutes  from "../../modules/student-parent/presentation/rout
 import { HttpStatusCode } from "../../shared/enums/http-status-code.enum";
 import adminAttendanceRoutes from "../../modules/attendance/presentation/routes/admin-attendance.routes";
 import teacherAttendanceRoutes  from "../../modules/attendance/presentation/routes/teacher-attendance.routes";
+import parentStudentRoutes from "../../modules/student-parent/presentation/routes/parent-student.routes";
 
 
 const router = Router();
@@ -31,5 +32,7 @@ router.use("/admin/students", studentParentRoutes);
 
 router.use("/admin/attendance", adminAttendanceRoutes);
 router.use("/teacher/attendance", teacherAttendanceRoutes);
+
+router.use("/parent/student-parents", parentStudentRoutes);
 
 export default router;
